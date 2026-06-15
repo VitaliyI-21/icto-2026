@@ -17,7 +17,15 @@
             <a-asset-item id="duckModel" src="../models/duck.glb"></a-asset-item>
         </assets>
 
-        <a-marker preset="hiro">
+        <a-marker type="pattern" url="../markers/pattern-my-marker.patt">
+            <a-entity 
+                gltf-model="../models/duck.glb" 
+                position="0 0.5 0" 
+                scale="1 1 1"
+                rotation="-90 0 0">
+            </a-entity>
+
+        </a-marker>
             
             <a-entity rotation="-90 0 0" scale="0.3 0.3 0.3" position="0 0 0">
                 
