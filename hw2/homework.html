@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лабораторна робота 2 — Локальні ресурси</title>
+    <title>Лабораторна робота 2 — Стійка версія</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 </head>
 <body>
 
     <a-scene stats>
-
-        <a-assets>
-            <img id="groundTex" src="../images/ground.jpg">
-            <img id="boxTex" src="../images/box_texture.jpg">
-            <img id="sphereTex" src="../images/sphere_texture.jpg">
-            
-            <a-asset-item id="duckModel" src="../models/duck.glb"></a-asset-item>
-        </assets>
 
         <a-sky color="#1A1A2E"></a-sky>
 
@@ -38,14 +30,14 @@
             <a-sphere 
                 position="-2 1 0" 
                 radius="0.8" 
-                src="#sphereTex"
+                src="../images/sphere_texture.jpg"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
             </a-sphere>
 
             <a-box 
                 position="0 1 0" 
                 width="1.2" height="1.2" depth="1.2" 
-                src="#boxTex"
+                src="../images/box_texture.jpg"
                 animation="property: material.color; from: #FFFFFF; to: #FF8888; dir: alternate; loop: true; dur: 3000">
             </a-box>
 
@@ -58,7 +50,7 @@
             </a-cylinder>
 
             <a-entity 
-                gltf-model="#duckModel" 
+                gltf-model="../models/duck.glb" 
                 position="0 0.6 0" 
                 scale="1 1 1"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
@@ -66,7 +58,7 @@
 
         </a-entity>
 
-        <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" src="#groundTex" repeat="5 5"></a-plane>
+        <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" src="../images/ground.jpg" repeat="5 5"></a-plane>
 
         <a-entity position="0 1.6 0">
             <a-camera look-controls wasd-controls></a-camera>
