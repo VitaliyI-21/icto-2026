@@ -19,7 +19,7 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            max-width: 500px;
+            max-width: 600px; /* Трохи розширено для двох карток поруч або в стовпчик */
             width: 100%;
             text-align: center;
         }
@@ -33,13 +33,20 @@
             color: #7f8c8d;
             font-weight: normal;
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+        }
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 25px;
         }
         .card {
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             padding: 20px;
             background-color: #fafbfc;
+            text-align: left; /* Текст опису вирівняно ліворуч для зручності */
         }
         .card h3 {
             margin-top: 0;
@@ -49,6 +56,9 @@
             font-size: 14px;
             color: #666;
             margin-bottom: 20px;
+        }
+        .btn-container {
+            text-align: center; /* Центрування кнопок всередині карток */
         }
         .btn {
             display: inline-block;
@@ -68,6 +78,14 @@
         .btn:active {
             transform: scale(0.98);
         }
+        /* Окремий колір для другої кнопки, щоб візуально розрізняти роботи */
+        .btn-hw2 {
+            background-color: #2ecc71;
+            box-shadow: 0 2px 5px rgba(46, 204, 113, 0.3);
+        }
+        .btn-hw2:hover {
+            background-color: #27ae60;
+        }
     </style>
 </head>
 <body>
@@ -77,11 +95,24 @@
         <h2>Студента групи Ім-25</h2>
         <h2>Литвиненко Віталія</h2>
 
-        <div class="card">
-            <h3>Домашнє завдання №1</h3>
-            <p>Створення 3D-сцени за допомогою бібліотеки A-Frame.</p>
+        <div class="task-list">
             
-            <a href="hw1/homework.html" class="btn">Відкрити 3D-сцену</a>
+            <div class="card">
+                <h3>Домашнє завдання №1 (п. 3.5)</h3>
+                <p>Створення базової 3D-сцени за допомогою бібліотеки A-Frame. Налаштування простих геометричних примітивів (небо, тор, циліндр, площина).</p>
+                <div class="btn-container">
+                    <a href="hw1/homework.html" class="btn">Відкрити 3D-сцену №1</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Домашнє завдання №2 (п. 3.10)</h3>
+                <p>Просунута 3D-сцена: інтеграція унікального MSDF-шрифту для відображення кирилиці, додавання складних текстур, завантаження зовнішньої моделі качки (.glb), групування елементів та налаштування різних типів анімацій.</p>
+                <div class="btn-container">
+                    <a href="hw2/homework.html" class="btn btn-hw2">Відкрити 3D-сцену №2</a>
+                </div>
+            </div>
+
         </div>
     </div>
 
