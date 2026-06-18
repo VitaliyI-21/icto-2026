@@ -2,40 +2,48 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>WebXR AR — дві моделі ліворуч і праворуч</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AR: моделі ліворуч і праворуч від обличчя</title>
 
+  <!-- MindAR Face 1.1.5 (самодостатній глобальний скрипт) -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-face-three.prod.js"></script>
+
+  <!-- importmap: three + addons (для GLTFLoader у loader.js) -->
   <script type="importmap">
   {
     "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      "three": "https://unpkg.com/three@0.137.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.137.0/examples/jsm/"
     }
   }
   </script>
 
+  <script src="./main.js" type="module"></script>
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden;
-                 font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a12; }
+    html, body { position: relative; margin: 0; width: 100%; height: 100%;
+                 overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+
+    /* Відео з камери знизу, полотно Three.js зверху */
+    .mindar-ui-overlay { background: transparent !important; }
+    a-scene, canvas, video {
+      position: absolute !important;
+      top: 0; left: 0;
+      width: 100% !important; height: 100% !important;
+      object-fit: cover;
+    }
+    video { z-index: 0 !important; }
+    canvas { z-index: 1 !important; }
 
     #info {
       position: fixed; top: 0; left: 0; right: 0; z-index: 5;
-      padding: 14px 18px; color: #e8e8f0;
-      background: linear-gradient(to bottom, rgba(10,10,20,0.85), transparent);
-      font-size: 0.9rem; line-height: 1.5; pointer-events: none;
-    }
-    #info b { color: #a78bfa; }
-
-    /* Fallback-сцена (для desktop без AR — звичайний 3D-перегляд) */
-    #hint {
-      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-      z-index: 5; color: #94a3b8; font-size: 0.8rem; text-align: center;
-      background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px;
+      padding: 12px 16px; color: #e8e8f0; font-size: 0.85rem; line-height: 1.5;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
       pointer-events: none;
     }
+    #info b { color: #a78bfa; }
     #err {
-      position: fixed; top: 70px; left: 12px; right: 12px; z-index: 20;
+      position: fixed; top: 64px; left: 12px; right: 12px; z-index: 20;
       background: rgba(180,30,30,0.92); color: #fff; padding: 12px 16px;
       border-radius: 10px; font-size: 0.85rem; display: none; line-height: 1.5;
     }
@@ -43,13 +51,9 @@
 </head>
 <body>
   <div id="info">
-    <b>WebXR AR-сцена.</b> Дві моделі розміщені за відносними координатами:
-    фламінго — <b>ліворуч</b> (X&nbsp;=&nbsp;−1), папуга — <b>праворуч</b> (X&nbsp;=&nbsp;+1) від глядача.
-    Натисніть кнопку нижче, щоб увійти в AR, або обертайте сцену мишею на комп'ютері.
+    <b>AR-сцена.</b> Дві моделі закріплені за обличчям:
+    🦩 <b>ліворуч</b> та 🦜 <b>праворуч</b> від голови — рухаються разом з нею.
   </div>
-  <div id="hint">На комп'ютері: тягніть мишею, щоб роздивитись · На телефоні: натисніть «Enter AR»</div>
   <div id="err"></div>
-
-  <script type="module" src="./main.js"></script>
 </body>
 </html>

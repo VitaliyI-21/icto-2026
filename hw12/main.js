@@ -1,11 +1,20 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { ARButton } from 'three/addons/webxr/ARButton.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+// Завантаження GLTF-моделей за методичкою (розділ 4.2, 4.7)
+import { loadGLTF } from "./loader.js";
 
-let camera, scene, renderer;
-let mixers = [];
-const clock = new THREE.Clock();
+// Перевірка завантаження MindAR
+if (!window.MINDAR || !window.MINDAR.FACE) {
+  document.body.insertAdjacentHTML('afterbegin',
+    '<div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b41e1e;' +
+    'color:#fff;padding:14px;font-family:sans-serif;font-size:14px;">' +
+    'Помилка: бібліотека MindAR не завантажилась.</div>');
+  throw new Error('window.MINDAR.FACE is undefined');
+}
+
+// THREE з глобального об'єкта MindAR (методичка 4.1)
+const THREE = window.MINDAR.FACE.THREE;
+
+// Масив мікшерів анімації моделей
+const mixers = [];
 
 function showError(msg) {
   const el = document.getElementById('err');
@@ -13,148 +22,84 @@ function showError(msg) {
   el.textContent = msg;
 }
 
-init();
+document.addEventListener("DOMContentLoaded", () => {
 
-function init() {
-  // --- Сцена ---
-  scene = new THREE.Scene();
+  const start = async () => {
+    // Ініціалізація AR-рушія MindAR Face
+    const mindarThree = new window.MINDAR.FACE.MindARThree({
+      container: document.body,
+    });
+    const { renderer, scene, camera } = mindarThree;
 
-  // --- Камера (глядач у точці (0,0,0), дивиться вздовж -Z) ---
-  camera = new THREE.PerspectiveCamera(
-    70, window.innerWidth / window.innerHeight, 0.01, 100
-  );
-  // Для desktop-перегляду трохи відсунемо камеру назад
-  camera.position.set(0, 1.4, 0);
+    // Прозоре полотно, щоб було видно відео з камери
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.backgroundColor = 'transparent';
 
-  // --- Освітлення ---
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x444466, 1.2);
-  hemi.position.set(0, 2, 0);
-  scene.add(hemi);
+    // Освітлення (напівсферичне + напрямлене перед обличчям)
+    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+    const light2 = new THREE.DirectionalLight(0xffffff, 0.8);
+    light2.position.set(0, 1, 2);
+    scene.add(light);
+    scene.add(light2);
 
-  const dir = new THREE.DirectionalLight(0xffffff, 1.5);
-  dir.position.set(1, 3, 2);
-  scene.add(dir);
+    // ===================================================
+    //  ЯКОРІ НА БІЧНИХ ОПОРНИХ ТОЧКАХ ОБЛИЧЧЯ
+    //   127 — ліва скроня (ЛІВОРУЧ від людини)
+    //   356 — права скроня (ПРАВОРУЧ від людини)
+    //  Моделі, прив'язані до них, рухаються разом з головою
+    // ===================================================
+    const leftAnchor  = mindarThree.addAnchor(127);  // ЛІВОРУЧ
+    const rightAnchor = mindarThree.addAnchor(356);   // ПРАВОРУЧ
 
-  // --- Рендерер з увімкненим WebXR ---
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x0a0a12, 1);  // фон для desktop; в AR стане прозорим
-  renderer.xr.enabled = true;
-  document.body.appendChild(renderer.domElement);
+    const BASE = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/';
 
-  // --- Кнопка входу в AR ---
-  const arButton = ARButton.createButton(renderer, {
-    optionalFeatures: ['local-floor', 'bounded-floor'],
-  });
-  document.body.appendChild(arButton);
+    // --- МОДЕЛЬ 1: ФЛАМІНГО, ЛІВОРУЧ ---
+    try {
+      const flamingo = await loadGLTF(BASE + 'Flamingo.glb');
+      flamingo.scene.scale.set(0.003, 0.003, 0.003);
+      // зміщення відносно скроні: ще трохи вліво та вперед
+      flamingo.scene.position.set(-0.35, 0, 0);
+      flamingo.scene.rotation.y = Math.PI / 2;  // обличчям до людини
+      leftAnchor.group.add(flamingo.scene);
 
-  // В AR-режимі фон робимо прозорим (видно камеру пристрою)
-  renderer.xr.addEventListener('sessionstart', () => {
-    renderer.setClearAlpha(0);
-    scene.background = null;
-  });
-  renderer.xr.addEventListener('sessionend', () => {
-    renderer.setClearColor(0x0a0a12, 1);
-  });
-
-  // --- OrbitControls для перегляду на комп'ютері (не заважає AR) ---
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 1.2, -2);   // дивимось у центр між моделями
-  controls.update();
-
-  // --- Допоміжна "підлога"-сітка для орієнтації (лише desktop) ---
-  const grid = new THREE.GridHelper(10, 20, 0x444466, 0x222233);
-  grid.position.y = 0;
-  scene.add(grid);
-
-  // --- Підписи-маркери ліворуч / праворуч ---
-  addLabelMarker(-1, 0x4ade80);  // ліворуч — зелений
-  addLabelMarker(1, 0xf472b6);   // праворуч — рожевий
-
-  // ===================================================
-  //  ЗАВАНТАЖЕННЯ ДВОХ GLTF-МОДЕЛЕЙ
-  //  Відносні координати глядача:
-  //   - ЛІВОРУЧ  = від'ємний X  (-1)
-  //   - ПРАВОРУЧ = додатний X   (+1)
-  //   - перед глядачем = від'ємний Z (-2)
-  // ===================================================
-  const loader = new GLTFLoader();
-  const BASE = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/';
-
-  // МОДЕЛЬ 1 — ФЛАМІНГО, ЛІВОРУЧ
-  loader.load(
-    BASE + 'Flamingo.glb',
-    (gltf) => {
-      const model = gltf.scene;
-      model.scale.set(0.008, 0.008, 0.008);
-      model.position.set(-1, 1.2, -2);   // ЛІВОРУЧ від глядача
-      model.rotation.y = Math.PI / 2;     // повернути обличчям до центру
-      scene.add(model);
-      // анімація польоту крил
-      if (gltf.animations.length) {
-        const mixer = new THREE.AnimationMixer(model);
-        mixer.clipAction(gltf.animations[0]).play();
+      // анімація крил
+      if (flamingo.animations && flamingo.animations.length) {
+        const mixer = new THREE.AnimationMixer(flamingo.scene);
+        mixer.clipAction(flamingo.animations[0]).play();
         mixers.push(mixer);
       }
-    },
-    undefined,
-    (e) => showError('Не вдалося завантажити модель фламінго: ' + e.message)
-  );
+    } catch (e) {
+      showError('Не вдалося завантажити фламінго: ' + e.message);
+    }
 
-  // МОДЕЛЬ 2 — ПАПУГА, ПРАВОРУЧ
-  loader.load(
-    BASE + 'Parrot.glb',
-    (gltf) => {
-      const model = gltf.scene;
-      model.scale.set(0.008, 0.008, 0.008);
-      model.position.set(1, 1.2, -2);     // ПРАВОРУЧ від глядача
-      model.rotation.y = -Math.PI / 2;    // повернути обличчям до центру
-      scene.add(model);
-      if (gltf.animations.length) {
-        const mixer = new THREE.AnimationMixer(model);
-        mixer.clipAction(gltf.animations[0]).play();
+    // --- МОДЕЛЬ 2: ПАПУГА, ПРАВОРУЧ ---
+    try {
+      const parrot = await loadGLTF(BASE + 'Parrot.glb');
+      parrot.scene.scale.set(0.003, 0.003, 0.003);
+      parrot.scene.position.set(0.35, 0, 0);  // ще трохи вправо
+      parrot.scene.rotation.y = -Math.PI / 2; // обличчям до людини
+      rightAnchor.group.add(parrot.scene);
+
+      if (parrot.animations && parrot.animations.length) {
+        const mixer = new THREE.AnimationMixer(parrot.scene);
+        mixer.clipAction(parrot.animations[0]).play();
         mixers.push(mixer);
       }
-    },
-    undefined,
-    (e) => showError('Не вдалося завантажити модель папуги: ' + e.message)
-  );
+    } catch (e) {
+      showError('Не вдалося завантажити папугу: ' + e.message);
+    }
 
-  window.addEventListener('resize', onResize);
-  renderer.setAnimationLoop(animate);
-}
+    // Запуск AR-рушія
+    await mindarThree.start();
 
-// Маркер-стовпчик під моделлю, щоб позиція ліво/право була наочною
-function addLabelMarker(x, color) {
-  const geo = new THREE.CylinderGeometry(0.03, 0.03, 1.2, 12);
-  const mat = new THREE.MeshStandardMaterial({
-    color, emissive: color, emissiveIntensity: 0.4,
-    transparent: true, opacity: 0.5,
-  });
-  const pillar = new THREE.Mesh(geo, mat);
-  pillar.position.set(x, 0.6, -2);
-  scene.add(pillar);
+    // Цикл рендерингу з оновленням анімацій
+    const clock = new THREE.Clock();
+    renderer.setAnimationLoop(() => {
+      const delta = clock.getDelta();
+      mixers.forEach((m) => m.update(delta));
+      renderer.render(scene, camera);
+    });
+  };
 
-  // світна основа
-  const ringGeo = new THREE.RingGeometry(0.12, 0.18, 24);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color, side: THREE.DoubleSide, transparent: true, opacity: 0.7,
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.set(x, 0.01, -2);
-  scene.add(ring);
-}
-
-function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function animate() {
-  const delta = clock.getDelta();
-  mixers.forEach((m) => m.update(delta));
-  renderer.render(scene, camera);
-}
+  start();
+});
