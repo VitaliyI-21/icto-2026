@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WebXR AR — дві моделі ліворуч і праворуч</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden;
+                 font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a12; }
+
+    #info {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+      padding: 14px 18px; color: #e8e8f0;
+      background: linear-gradient(to bottom, rgba(10,10,20,0.85), transparent);
+      font-size: 0.9rem; line-height: 1.5; pointer-events: none;
+    }
+    #info b { color: #a78bfa; }
+
+    /* Fallback-сцена (для desktop без AR — звичайний 3D-перегляд) */
+    #hint {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      z-index: 5; color: #94a3b8; font-size: 0.8rem; text-align: center;
+      background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px;
+      pointer-events: none;
+    }
+    #err {
+      position: fixed; top: 70px; left: 12px; right: 12px; z-index: 20;
+      background: rgba(180,30,30,0.92); color: #fff; padding: 12px 16px;
+      border-radius: 10px; font-size: 0.85rem; display: none; line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <b>WebXR AR-сцена.</b> Дві моделі розміщені за відносними координатами:
+    фламінго — <b>ліворуч</b> (X&nbsp;=&nbsp;−1), папуга — <b>праворуч</b> (X&nbsp;=&nbsp;+1) від глядача.
+    Натисніть кнопку нижче, щоб увійти в AR, або обертайте сцену мишею на комп'ютері.
+  </div>
+  <div id="hint">На комп'ютері: тягніть мишею, щоб роздивитись · На телефоні: натисніть «Enter AR»</div>
+  <div id="err"></div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
