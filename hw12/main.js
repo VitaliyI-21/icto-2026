@@ -56,9 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- МОДЕЛЬ 1: ФЛАМІНГО, ЛІВОРУЧ ---
     try {
       const flamingo = await loadGLTF(BASE + 'Flamingo.glb');
-      flamingo.scene.scale.set(0.003, 0.003, 0.003);
-      // зміщення відносно скроні: ще трохи вліво та вперед
-      flamingo.scene.position.set(-0.35, 0, 0);
+      flamingo.scene.scale.set(0.006, 0.006, 0.006);
+      // зміщення відносно скроні: далі вліво та трохи вперед
+      flamingo.scene.position.set(-0.7, 0, 0);
       flamingo.scene.rotation.y = Math.PI / 2;  // обличчям до людини
       leftAnchor.group.add(flamingo.scene);
 
@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- МОДЕЛЬ 2: ПАПУГА, ПРАВОРУЧ ---
     try {
       const parrot = await loadGLTF(BASE + 'Parrot.glb');
-      parrot.scene.scale.set(0.003, 0.003, 0.003);
-      parrot.scene.position.set(0.35, 0, 0);  // ще трохи вправо
+      parrot.scene.scale.set(0.006, 0.006, 0.006);
+      parrot.scene.position.set(0.7, 0, 0);  // далі вправо
       parrot.scene.rotation.y = -Math.PI / 2; // обличчям до людини
       rightAnchor.group.add(parrot.scene);
 
