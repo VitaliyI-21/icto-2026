@@ -175,6 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateAnimation(delta) {
     if (!active) return;
     active.t += delta * SPEED;
+
+    // Фаза паузи: кільця немає, просто чекаємо й запускаємо наступний рух
+    if (active.phase === 'pause') {
+      if (active.t >= 0.6) startNextMove();
+      return;
+    }
+
     const r = active.ring.mesh;
     const t = Math.min(active.t, 1);
     const ease = t * t * (3 - 2 * t);  // smoothstep
@@ -200,8 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // пауза перед наступним рухом
         active = { phase: 'pause', t: 0, ring: null };
       }
-    } else if (active.phase === 'pause') {
-      if (active.t >= 0.6) startNextMove();
     }
   }
 
