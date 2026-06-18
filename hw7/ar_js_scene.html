@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Hanoi Towers - AR.js</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
+      // Спрощений скрипт переміщення для AR середовища
+      AFRAME.registerComponent('ar-hanoi', {
+        init: function () {
+          this.timer = 0; this.current = 1;
+          this.pegsX = { 'center': 0, 'right': 2 };
+          this.heights = { 'center': 0, 'right': 0 };
+        },
+        tick: function (time, timeDelta) {
+          this.timer += timeDelta;
+          if (this.timer >= 1500 && this.current <= 7) {
+            this.timer = 0;
+            let disk = document.getElementById('ar-disk-' + this.current);
+            let targetPeg = (this.current % 2 === 0) ? 'center' : 'right';
+            let targetX = this.pegsX[targetPeg];
+            let targetY = 0.1 + (this.heights[targetPeg] * 0.25);
+            this.heights[targetPeg]++;
+            
+            disk.setAttribute('animation', {
+              property: 'position',
+              to: `${targetX} ${targetY} 0`,
+              dur: 800,
+              easing: 'easeInOutQuad'
+            });
+            this.current++;
+          }
+        }
+      });
+    </script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" ar-hanoi>
+      
+      <a-marker type="pattern" url="./hanoi_emblem.patt">
+        
+        <a-entity scale="0.15 0.15 0.15" position="0 0 0">
+          <a-box position="0 0 0" width="6" height="0.2" depth="2" color="#4a2700"></a-box>
+          <a-cylinder position="-2 1 0" radius="0.08" height="2" color="#d2b48c"></a-cylinder>
+          <a-cylinder position="0 1 0" radius="0.08" height="2" color="#d2b48c"></a-cylinder>
+          <a-cylinder position="2 1 0" radius="0.08" height="2" color="#d2b48c"></a-cylinder>
+
+          <a-torus id="ar-disk-7" position="-2 0.1 0" radius="0.8" radius-tubular="0.08" rotation="90 0 0" color="#FF0000"></a-torus>
+          <a-torus id="ar-disk-6" position="-2 0.35 0" radius="0.7" radius-tubular="0.08" rotation="90 0 0" color="#FF7F00"></a-torus>
+          <a-torus id="ar-disk-5" position="-2 0.6 0" radius="0.6" radius-tubular="0.08" rotation="90 0 0" color="#FFFF00"></a-torus>
+          <a-torus id="ar-disk-4" position="-2 0.85 0" radius="0.5" radius-tubular="0.08" rotation="90 0 0" color="#00FF00"></a-torus>
+          <a-torus id="ar-disk-3" position="-2 1.1 0" radius="0.4" radius-tubular="0.08" rotation="90 0 0" color="#0000FF"></a-torus>
+          <a-torus id="ar-disk-2" position="-2 1.35 0" radius="0.3" radius-tubular="0.08" rotation="90 0 0" color="#4B0082"></a-torus>
+          <a-torus id="ar-disk-1" position="-2 1.6 0" radius="0.2" radius-tubular="0.08" rotation="90 0 0" color="#9400D3"></a-torus>
+        </a-entity>
+
+      </a-marker>
+      
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>

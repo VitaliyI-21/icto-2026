@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Hanoi Towers VR - Lab Work</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script>
+      AFRAME.registerComponent('hanoi-animation', {
+        init: function () {
+          // Пошук об'єктів кілець у сцені (від 1 до 7)
+          this.disks = [];
+          for (let i = 1; i <= 7; i++) {
+            this.disks.push(document.getElementById('disk-' + i));
+          }
+          
+          this.step = 0;
+          this.timer = 0;
+          this.moveInterval = 1500; // Інтервал між ходами (1.5 сек)
+          this.currentMovingDisk = 1; 
+
+          // Координати стрижнів по осі X
+          this.pegsX = {
+            'left': -2,
+            'center': 0,
+            'right': 2
+          };
+
+          // Лічильники поточної висоти (Y) на кожному стрижні для правильного укладання
+          this.heights = { 'left': 7, 'center': 0, 'right': 0 };
+        },
+
+        tick: function (time, timeDelta) {
+          this.timer += timeDelta;
+          if (this.timer >= this.moveInterval) {
+            this.timer = 0;
+            if (this.currentMovingDisk <= 7) {
+              this.moveNextDisk(this.currentMovingDisk);
+              this.currentMovingDisk++;
+            }
+          }
+        },
+
+        moveNextDisk: function (num) {
+          let disk = document.getElementById('disk-' + num);
+          let targetPeg = (num % 2 === 0) ? 'center' : 'right';
+          
+          // Розрахунок нової позиції
+          let targetX = this.pegsX[targetPeg];
+          let targetY = 0.1 + (this.heights[targetPeg] * 0.25); // 0.25 - висота кільця
+          
+          // Оновлюємо лічильники веж
+          this.heights['left']--;
+          this.heights[targetPeg]++;
+
+          // Запуск плавної анімації переміщення через A-Frame всередині рушія
+          disk.setAttribute('animation__pos', {
+            property: 'position',
+            to: `${targetX} ${targetY} 0`,
+            dur: 1000,
+            easing: 'easeInOutQuad'
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene hanoi-animation>
+      <a-assets>
+        <img id="space-bg" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/cube/MilkyWay/dark-s_px.jpg">
+      </a-assets>
+
+      <a-sky src="#space-bg"></a-sky>
+      <a-camera position="0 3 6" look-controls wash-controls></a-camera>
+      <a-light type="ambient" color="#bbb"></a-light>
+      <a-light type="directional" color="#fff" intensity="0.6" position="-1 4 2"></a-light>
+
+      <a-box position="0 0 0" width="6" height="0.2" depth="2" color="#4a2700"></a-box>
+
+      <a-cylinder id="peg-left" position="-2 1 0" radius="0.08" height="2" color="#d2b48c"></a-cylinder>
+      <a-cylinder id="peg-center" position="0 1 0" radius="0.08" height="2" color="#d2b48c"></a-cylinder>
+      <a-cylinder id="peg-right" position="2 1 0" radius="0.08" height="2" color="#d2b48c"></a-cylinder>
+
+      <a-torus id="disk-7" position="-2 0.1 0" radius="0.8" radius-tubular="0.08" rotation="90 0 0" color="#FF0000"></a-torus> <a-torus id="disk-6" position="-2 0.35 0" radius="0.7" radius-tubular="0.08" rotation="90 0 0" color="#FF7F00"></a-torus> <a-torus id="disk-5" position="-2 0.6 0" radius="0.6" radius-tubular="0.08" rotation="90 0 0" color="#FFFF00"></a-torus> <a-torus id="disk-4" position="-2 0.85 0" radius="0.5" radius-tubular="0.08" rotation="90 0 0" color="#00FF00"></a-torus> <a-torus id="disk-3" position="-2 1.1 0" radius="0.4" radius-tubular="0.08" rotation="90 0 0" color="#0000FF"></a-torus> <a-torus id="disk-2" position="-2 1.35 0" radius="0.3" radius-tubular="0.08" rotation="90 0 0" color="#4B0082"></a-torus> <a-torus id="disk-1" position="-2 1.6 0" radius="0.2" radius-tubular="0.08" rotation="90 0 0" color="#9400D3"></a-torus> </a-scene>
+  </body>
+</html>

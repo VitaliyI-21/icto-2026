@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanoi Towers - MindAR</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script>
+      AFRAME.registerComponent('mindar-hanoi', {
+        init: function () {
+          this.timer = 0; this.current = 1;
+          this.pegsX = { 'center': 0, 'right': 0.4 };
+          this.heights = { 'center': 0, 'right': 0 };
+        },
+        tick: function (time, timeDelta) {
+          this.timer += timeDelta;
+          if (this.timer >= 1500 && this.current <= 7) {
+            this.timer = 0;
+            let disk = document.getElementById('mind-disk-' + this.current);
+            let targetPeg = (this.current % 2 === 0) ? 'center' : 'right';
+            let targetX = this.pegsX[targetPeg];
+            let targetY = 0.02 + (this.heights[targetPeg] * 0.04);
+            this.heights[targetPeg]++;
+            
+            disk.setAttribute('animation', {
+              property: 'position',
+              to: `${targetX} ${targetY} 0`,
+              dur: 800,
+              easing: 'easeInOutQuad'
+            });
+            this.current++;
+          }
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: ./hanoi_target.mind; autoStart: true;" 
+             embedded vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false"
+             mindar-hanoi>
+      
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        
+        <a-box position="0 0 0" width="1.2" height="0.02" depth="0.4" color="#4a2700"></a-box>
+        <a-cylinder position="-0.4 0.2 0" radius="0.015" height="0.4" color="#d2b48c"></a-cylinder>
+        <a-cylinder position="0 0.2 0" radius="0.015" height="0.4" color="#d2b48c"></a-cylinder>
+        <a-cylinder position="0.4 0.2 0" radius="0.015" height="0.4" color="#d2b48c"></a-cylinder>
+
+        <a-torus id="mind-disk-7" position="-0.4 0.02 0" radius="0.16" radius-tubular="0.015" rotation="90 0 0" color="#FF0000"></a-torus>
+        <a-torus id="mind-disk-6" position="-0.4 0.06 0" radius="0.14" radius-tubular="0.015" rotation="90 0 0" color="#FF7F00"></a-torus>
+        <a-torus id="mind-disk-5" position="-0.4 0.10 0" radius="0.12" radius-tubular="0.015" rotation="90 0 0" color="#FFFF00"></a-torus>
+        <a-torus id="mind-disk-4" position="-0.4 0.14 0" radius="0.10" radius-tubular="0.015" rotation="90 0 0" color="#00FF00"></a-torus>
+        <a-torus id="mind-disk-3" position="-0.4 0.18 0" radius="0.08" radius-tubular="0.015" rotation="90 0 0" color="#0000FF"></a-torus>
+        <a-torus id="mind-disk-2" position="-0.4 0.22 0" radius="0.06" radius-tubular="0.015" rotation="90 0 0" color="#4B0082"></a-torus>
+        <a-torus id="mind-disk-1" position="-0.4 0.26 0" radius="0.04" radius-tubular="0.015" rotation="90 0 0" color="#9400D3"></a-torus>
+
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
