@@ -2,18 +2,18 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Сонячна система - VR Проект</title>
+    <title>Сонячна система - VR</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
 </head>
 <body>
     <a-scene>
         <a-assets>
-            <img id="sun-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/sun.jpg" crossorigin="anonymous">
-            <img id="mercury-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/mercury.jpg" crossorigin="anonymous">
-            <img id="venus-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/venus.jpg" crossorigin="anonymous">
-            <img id="earth-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/earth.jpg" crossorigin="anonymous">
-            <img id="mars-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/mars.jpg" crossorigin="anonymous">
-            <img id="jupiter-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/jupiter.jpg" crossorigin="anonymous">
+            <img id="sun-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/sun.jpg" crossorigin="anonymous">
+            <img id="mercury-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/mercury.jpg" crossorigin="anonymous">
+            <img id="venus-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/venus.jpg" crossorigin="anonymous">
+            <img id="earth-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/earth.jpg" crossorigin="anonymous">
+            <img id="mars-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/mars.jpg" crossorigin="anonymous">
+            <img id="jupiter-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/jupiter.jpg" crossorigin="anonymous">
             <img id="space-bg" src="https://cdn.jsdelivr.net/gh/aframevr/sample-assets@master/assets/images/space/starry-sky.jpg" crossorigin="anonymous">
         </a-assets>
 
@@ -22,42 +22,36 @@
         <a-light type="ambient" color="#444"></a-light>
         <a-light type="point" intensity="2" position="0 0 0"></a-light>
 
-        <a-sphere id="sun" position="0 0 0" radius="3" src="#sun-texture"
+        <a-sphere id="sun" position="0 0 0" radius="3" src="#sun-txt"
                   animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
         </a-sphere>
 
         <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-            <a-sphere position="5 0 0" radius="0.3" src="#mercury-texture"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear">
-            </a-sphere>
+            <a-sphere position="5 0 0" radius="0.3" src="#mercury-txt"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear"></a-sphere>
         </a-entity>
 
         <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
-            <a-sphere position="8 0 0" radius="0.5" src="#venus-texture"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
-            </a-sphere>
+            <a-sphere position="8 0 0" radius="0.5" src="#venus-txt"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear"></a-sphere>
         </a-entity>
 
         <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear">
-            <a-sphere position="12 0 0" radius="0.6" src="#earth-texture"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-            </a-sphere>
+            <a-sphere position="12 0 0" radius="0.6" src="#earth-txt"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-sphere>
         </a-entity>
 
         <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 16000; easing: linear">
-            <a-sphere position="16 0 0" radius="0.4" src="#mars-texture"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-            </a-sphere>
+            <a-sphere position="16 0 0" radius="0.4" src="#mars-txt"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-sphere>
         </a-entity>
 
         <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 25000; easing: linear">
-            <a-sphere position="22 0 0" radius="1.2" src="#jupiter-texture"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
-            </a-sphere>
+            <a-sphere position="21 0 0" radius="1.2" src="#jupiter-txt"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"></a-sphere>
         </a-entity>
 
-        <a-entity camera look-controls wasd-controls position="0 15 30" rotation="-25 0 0"></a-entity>
-
+        <a-entity camera look-controls wasd-controls position="0 18 28" rotation="-30 0 0"></a-entity>
     </a-scene>
 </body>
 </html>
