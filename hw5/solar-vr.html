@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Сонячна система — VR</title>
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+<style>
+  body{margin:0;overflow:hidden;background:#000}
+  #ui{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:100;
+    background:rgba(0,0,0,.75);backdrop-filter:blur(6px);border:1px solid #334466;
+    border-radius:10px;padding:.4rem 1.1rem;color:#e2e8f0;font-family:system-ui;
+    font-size:.77rem;text-align:center;pointer-events:none;white-space:nowrap}
+  #ui b{color:#00d4ff}
+  #tip{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    background:rgba(0,0,0,.88);color:#fff;padding:.4rem 1rem;border-radius:8px;
+    font-family:system-ui;font-size:.8rem;display:none;z-index:100;
+    border:1px solid #00d4ff;max-width:90vw;text-align:center;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="ui">🪐 <b>Сонячна система — VR</b> &nbsp;|&nbsp; WASD = рух &nbsp;|&nbsp; Миша = огляд &nbsp;|&nbsp; Навести = інфо</div>
+<div id="tip"></div>
+
+<a-scene background="color:#000008"
+         renderer="antialias:true;colorManagement:true"
+         loading-screen="backgroundColor:#000008;dotsColor:#00d4ff">
+
+  <a-assets timeout="30000">
+    <img id="sun"     src="textures/sun.jpg"    crossorigin="anonymous"/>
+    <img id="mercury" src="textures/mercury.jpg"crossorigin="anonymous"/>
+    <img id="venus"   src="textures/venus.jpg"  crossorigin="anonymous"/>
+    <img id="earth"   src="textures/earth.jpg"  crossorigin="anonymous"/>
+    <img id="mars"    src="textures/mars.jpg"   crossorigin="anonymous"/>
+    <img id="jupiter" src="textures/jupiter.jpg"crossorigin="anonymous"/>
+    <img id="saturn"  src="textures/saturn.jpg" crossorigin="anonymous"/>
+    <img id="uranus"  src="textures/uranus.jpg" crossorigin="anonymous"/>
+    <img id="neptune" src="textures/neptune.jpg"crossorigin="anonymous"/>
+    <img id="stars"   src="textures/stars.jpg"  crossorigin="anonymous"/>
+  </a-assets>
+
+  <!-- Зоряне небо -->
+  <a-sky src="#stars" radius="4000" rotation="0 -20 0"></a-sky>
+
+  <!-- Сонце -->
+  <a-sphere position="0 0 0" radius="4" src="#sun"
+            material="emissive:#ff6600;emissiveIntensity:0.5;shader:standard"
+            animation="property:rotation;to:0 360 0;loop:true;dur:24000;easing:linear"
+            class="pl" data-name="☀️ Сонце"
+            data-info="Зірка G2V · Маса 1.989×10³⁰ кг · Радіус 695 700 км · T=5778 K">
+  </a-sphere>
+  <a-light type="point" position="0 0 0" color="#fff8e0" intensity="3" decay="2" distance="400"></a-light>
+  <a-light type="ambient" color="#0a0a1a" intensity="0.5"></a-light>
+
+  <!-- Меркурій -->
+  <a-entity orbit="spd:1.607;r:8">
+    <a-sphere radius="0.38" position="8 0 0" src="#mercury"
+              material="shader:standard;roughness:0.95"
+              animation="property:rotation;to:0 360 0;loop:true;dur:5832;easing:linear"
+              class="pl" data-name="☿ Меркурій"
+              data-info="1-а планета · 57.9 млн км · Рік: 88 днів · T: -180…+430°C">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Венера -->
+  <a-entity orbit="spd:1.174;r:13">
+    <a-sphere radius="0.95" position="13 0 0" src="#venus"
+              material="shader:standard;roughness:0.85"
+              animation="property:rotation;to:0 -360 0;loop:true;dur:24300;easing:linear"
+              class="pl" data-name="♀ Венера"
+              data-info="2-а планета · 108 млн км · Рік: 225 днів · +465°C · обертання зворотне">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Земля -->
+  <a-entity orbit="spd:1.0;r:19">
+    <a-sphere radius="1.0" position="19 0 0" src="#earth"
+              material="shader:standard;roughness:0.7;metalness:0.05"
+              animation="property:rotation;to:0 360 0;loop:true;dur:1440;easing:linear"
+              class="pl" data-name="🌍 Земля"
+              data-info="3-я планета · 149.6 млн км · Рік: 365.25 днів · Є життя!">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Марс -->
+  <a-entity orbit="spd:0.802;r:25">
+    <a-sphere radius="0.53" position="25 0 0" src="#mars"
+              material="shader:standard;roughness:0.98"
+              animation="property:rotation;to:0 360 0;loop:true;dur:1477;easing:linear"
+              class="pl" data-name="♂ Марс"
+              data-info="4-а планета · 228 млн км · Рік: 687 днів · Олімп: 21.9 км">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Юпітер -->
+  <a-entity orbit="spd:0.434;r:42">
+    <a-sphere radius="2.8" position="42 0 0" src="#jupiter"
+              material="shader:standard;roughness:0.6"
+              animation="property:rotation;to:0 360 0;loop:true;dur:356;easing:linear"
+              class="pl" data-name="♃ Юпітер"
+              data-info="5-а планета · 778 млн км · Рік: 11.86 р · Найбільша планета">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Сатурн -->
+  <a-entity orbit="spd:0.323;r:60">
+    <a-entity position="60 0 0">
+      <a-sphere radius="2.3" src="#saturn"
+                material="shader:standard;roughness:0.7"
+                animation="property:rotation;to:0 360 0;loop:true;dur:440;easing:linear"
+                class="pl" data-name="♄ Сатурн"
+                data-info="6-а планета · 1.43 млрд км · Рік: 29.5 р · Кільця з льоду та пилу">
+      </a-sphere>
+      <a-torus radius="3.6" radius-tubular="0.65" segments-tubular="3" segments-radial="80"
+               rotation="90 0 0" material="color:#c8b577;opacity:0.6;transparent:true;side:double;shader:flat"></a-torus>
+      <a-torus radius="4.8" radius-tubular="0.5"  segments-tubular="3" segments-radial="80"
+               rotation="90 0 0" material="color:#d4c48e;opacity:0.35;transparent:true;side:double;shader:flat"></a-torus>
+      <a-torus radius="5.6" radius-tubular="0.3"  segments-tubular="3" segments-radial="80"
+               rotation="90 0 0" material="color:#bfb07a;opacity:0.2;transparent:true;side:double;shader:flat"></a-torus>
+    </a-entity>
+  </a-entity>
+
+  <!-- Уран -->
+  <a-entity orbit="spd:0.228;r:78">
+    <a-sphere radius="1.6" position="78 0 0" src="#uranus"
+              material="shader:standard;roughness:0.5"
+              animation="property:rotation;to:360 0 0;loop:true;dur:620;easing:linear"
+              class="pl" data-name="⛢ Уран"
+              data-info="7-а планета · 2.87 млрд км · Рік: 84 р · Нахил осі 97.8°">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Нептун -->
+  <a-entity orbit="spd:0.182;r:96">
+    <a-sphere radius="1.55" position="96 0 0" src="#neptune"
+              material="shader:standard;roughness:0.5"
+              animation="property:rotation;to:0 360 0;loop:true;dur:590;easing:linear"
+              class="pl" data-name="♆ Нептун"
+              data-info="8-а планета · 4.52 млрд км · Рік: 164.8 р · Вітри 2100 км/год">
+    </a-sphere>
+  </a-entity>
+
+  <!-- Орбітальні кола -->
+  <a-entity orbit-rings></a-entity>
+
+  <!-- Камера -->
+  <a-entity id="rig" position="0 10 65">
+    <a-camera wasd-controls="acceleration:30" look-controls>
+      <a-cursor color="#00d4ff" opacity="0.8" fuse="false"
+                raycaster="objects:.pl;far:600"></a-cursor>
+    </a-camera>
+  </a-entity>
+
+</a-scene>
+
+<script>
+AFRAME.registerComponent('orbit',{
+  schema:{spd:{type:'number',default:1},r:{type:'number',default:10}},
+  init(){this._a=Math.random()*Math.PI*2;},
+  tick(_,dt){
+    this._a += (2*Math.PI/16000)*this.data.spd*dt;
+    this.el.object3D.rotation.y=this._a;
+  }
+});
+
+AFRAME.registerComponent('orbit-rings',{
+  init(){
+    [8,13,19,25,42,60,78,96].forEach(r=>{
+      const t=document.createElement('a-torus');
+      t.setAttribute('radius',r);
+      t.setAttribute('radius-tubular','0.05');
+      t.setAttribute('segments-tubular','120');
+      t.setAttribute('segments-radial','3');
+      t.setAttribute('rotation','90 0 0');
+      t.setAttribute('material','color:#1a2a44;opacity:0.4;transparent:true;shader:flat;depthWrite:false');
+      this.el.appendChild(t);
+    });
+  }
+});
+
+const tip=document.getElementById('tip');
+document.querySelectorAll('.pl').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    tip.textContent=`${el.dataset.name}  —  ${el.dataset.info}`;
+    tip.style.display='block';
+  });
+  el.addEventListener('mouseleave',()=>tip.style.display='none');
+});
+</script>
+</body>
+</html>
