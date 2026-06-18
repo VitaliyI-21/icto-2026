@@ -1,129 +1,49 @@
 <!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <title>Сонячна система в AR - Мультимаркер</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-</head>
-<body style="margin: 0; overflow: hidden;">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System AR - MindAR</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: color_and_matrix; matrixCodeType: 3x3;">
-        
-        <a-assets>
-            <img id="sun-txt" src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/space/sun.jpg" crossorigin="anonymous">
-            <img id="earth-txt" src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/space/earth_atmo_2048.jpg" crossorigin="anonymous">
-            <img id="jupiter-txt" src="https://i.imgur.com/S6p13mN.jpeg" crossorigin="anonymous">
-        </a-assets>
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 3" 
+             color-space="sRGB" 
+             renderer="colorManagement: true, physicallyCorrectLights" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <img id="sun" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/sun.jpg">
+        <img id="earth" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg">
+        <img id="jupiter" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/jupiter.jpg">
+      </a-assets>
 
-        <a-light type="ambient" color="#fff"></a-light>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <a-marker preset="hiro">
-            <a-entity scale="0.15 0.15 0.15" position="0 0 0" rotation="-90 0 0">
-                <a-sphere id="sun-ar" position="0 0 0" radius="1.5" src="#sun-txt">
-                    <a-entity planet-ar="name: SunAR; mass: 1.989e30; dist: 0; isSun: true"></a-entity>
-                </a-sphere>
-                <a-sphere radius="0.5" src="#earth-txt">
-                    <a-entity planet-ar="name: EarthAR; mass: 5.972e24; dist: 4.5e10"></a-entity>
-                </a-sphere>
-            </a-entity>
-        </a-marker>
+      <a-entity mindar-image="targetIndex: 0">
+        <a-sphere radius="0.3" src="#sun" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000"></a-sphere>
+        <a-text value="Sun Center" position="-0.3 0.5 0" color="yellow" width="3"></a-text>
+      </a-entity>
 
-        <a-marker preset="kanji">
-            <a-entity scale="0.2 0.2 0.2" position="0 0 0" rotation="-90 0 0">
-                <a-sphere position="0 0 0" radius="1.2" src="#jupiter-txt">
-                    <a-entity planet-ar="name: JupiterBase; mass: 1.898e27; dist: 0; isSun: true"></a-entity>
-                </a-sphere>
-                <a-sphere radius="0.4" src="#earth-txt" color="#9f9">
-                    <a-entity planet-ar="name: Satellite; mass: 5.972e24; dist: 3.0e10"></a-entity>
-                </a-sphere>
-            </a-entity>
-        </a-marker>
+      <a-entity mindar-image="targetIndex: 1">
+        <a-sphere radius="0.2" src="#earth" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-sphere>
+        <a-text value="Earth Station" position="-0.3 0.5 0" color="cyan" width="3"></a-text>
+      </a-entity>
 
-        <a-marker type="pattern" url="pattern-marker.patt">
-            <a-box position="0 0.5 0" material="color: #00E5FF; opacity: 0.85;" 
-                   animation="property: rotation; to: 0 360 360; loop: true; dur: 5000; easing: linear">
-                <a-text value="Litvinenko\nIm-25" align="center" color="#fff" width="3" position="0 0 0.51"></a-text>
-            </a-box>
-        </a-marker>
+      <a-entity mindar-image="targetIndex: 2">
+        <a-entity rotation="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000">
+             <a-sphere position="0 0 0" radius="0.15" src="#sun"></a-sphere>
+             <a-sphere position="0.4 0 0" radius="0.08" src="#jupiter"></a-sphere>
+        </a-entity>
+        <a-text value="My Custom VR Marker" position="-0.5 -0.4 0" color="green" width="4"></a-text>
+      </a-entity>
 
-        <a-entity camera></a-entity>
     </a-scene>
-
-    <script>
-        const G = 6.6743e-11;
-        const arPlanets = [];
-
-        AFRAME.registerComponent('planet-ar', {
-            schema: {
-                name: {type: 'string'},
-                mass: {type: 'number'},
-                dist: {type: 'number'},
-                isSun: {type: 'boolean', default: false}
-            },
-            init: function() {
-                this.parentSphere = this.el.parentEl;
-                this.scaleFactor = 1e10; 
-                let startX = this.data.dist / this.scaleFactor;
-                
-                this.parentSphere.setAttribute('position', { x: startX, y: 0, z: 0 });
-                let vMag = 0;
-                if (!this.data.isSun) {
-                    vMag = Math.sqrt(G * 1.989e30 / (this.data.dist * 2)); 
-                }
-                
-                this.physicsData = {
-                    el: this.parentSphere,
-                    name: this.data.name,
-                    mass: this.data.mass,
-                    pos: [this.data.dist, 0, 0],
-                    v: [0, 0, vMag],
-                    a: [0, 0, 0]
-                };
-                arPlanets.push(this.physicsData);
-            }
-        });
-
-        document.querySelector('a-scene').addEventListener('render-target-loaded', function () {
-            const sceneEl = document.querySelector('a-scene');
-            const dt = 86400 * 8; 
-
-            sceneEl.tick = function(time, timeDelta) {
-                for (let i = 0; i < arPlanets.length; i++) {
-                    arPlanets[i].a = [0, 0, 0];
-                    for (let j = 0; j < arPlanets.length; j++) {
-                        if (i !== j) {
-                            let r = [
-                                arPlanets[j].pos[0] - arPlanets[i].pos[0],
-                                arPlanets[j].pos[1] - arPlanets[i].pos[1],
-                                arPlanets[j].pos[2] - arPlanets[i].pos[2]
-                            ];
-                            let dist = Math.sqrt(r[0]*r[0] + r[1]*r[1] + r[2]*r[2]) || 1;
-                            let forceMag = (G * arPlanets[j].mass) / Math.pow(dist, 3);
-                            
-                            arPlanets[i].a[0] += forceMag * r[0];
-                            arPlanets[i].a[1] += forceMag * r[1];
-                            arPlanets[i].a[2] += forceMag * r[2];
-                        }
-                    }
-                }
-
-                for (let i = 0; i < arPlanets.length; i++) {
-                    if (arPlanets[i].name === 'SunAR' || arPlanets[i].name === 'JupiterBase') continue;
-
-                    for (let k = 0; k < 3; k++) {
-                        arPlanets[i].v[k] += arPlanets[i].a[k] * dt;
-                        arPlanets[i].pos[k] += arPlanets[i].v[k] * dt;
-                    }
-
-                    arPlanets[i].el.setAttribute('position', {
-                        x: arPlanets[i].pos[0] / 1e10,
-                        y: arPlanets[i].pos[1] / 1e10,
-                        z: arPlanets[i].pos[2] / 1e10
-                    });
-                }
-            };
-        });
-    </script>
-</body>
+  </body>
 </html>
