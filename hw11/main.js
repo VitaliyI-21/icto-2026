@@ -1,3 +1,4 @@
+// THREE береться з глобального об'єкта MindAR (як у методичці, розділ 4.1)
 const THREE = window.MINDAR.FACE.THREE;
 
 document.addEventListener('DOMContentLoaded', () => {

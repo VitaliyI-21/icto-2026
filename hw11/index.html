@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AR Маска</title>
+
+  <!-- MindAR Face: звичайний <script>, створює глобальний window.MINDAR -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-face-three.prod.js"></script>
+
+  <!-- importmap для three (потрібен Three.js усередині модуля main.js) -->
   <script type="importmap">
   {
     "imports": {
@@ -12,10 +16,13 @@
     }
   }
   </script>
+
+  <!-- основна програма як модуль -->
+  <script src="./main.js" type="module"></script>
+
   <style>
     html, body { position: relative; margin: 0; width: 100%; height: 100%;
                  overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
-
     #mask-controls {
       position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
       z-index: 10; display: flex; gap: 18px;
@@ -38,7 +45,5 @@
     <button class="mask-btn active" id="btn-demon" onclick="switchMask('demon')" title="Чортик">😈</button>
     <button class="mask-btn"        id="btn-sage"  onclick="switchMask('sage')"  title="Мудрець">🐸</button>
   </div>
-
-  <script type="module" src="./main.js"></script>
 </body>
 </html>
