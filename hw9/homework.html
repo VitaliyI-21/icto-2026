@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindAR - Video & Model Target Scene</title>
+    <title>MindAR - 100% Stable AR Video & Model</title>
     
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -11,7 +11,7 @@
     <style>
       body { margin: 0; overflow: hidden; }
       
-      /* Кнопка поверх екрана для активації медіа (захист від блокування звуку/відео браузерами) */
+      /* Кнопка розблокування медіаконтенту для мобільних пристроїв */
       #ar-overlay-btn {
         position: absolute;
         bottom: 30px;
@@ -32,35 +32,34 @@
     </style>
 
     <script>
-      // Компонент, який керує відеофайлом під час сканування маркеру
+      // Компонент автоматичного керування локальним відео через маркер
       AFRAME.registerComponent('video-controller', {
         init: function () {
           this.video = document.querySelector('#ar-video');
           
-          // Коли камера знайшла Маркер №0 — запускаємо відео
+          // Подія розпізнавання маркера №0
           this.el.addEventListener('targetFound', () => {
-            console.log("Маркер відео знайдено!");
+            console.log("Маркер відео розпізнано");
             this.video.play().catch(err => {
-              console.log("Автоплей заблоковано, чекаємо взаємодії користувача.");
+              console.log("Очікування натискання на головну кнопку");
             });
           });
 
-          // Коли маркер зник з поля зору камери — ставимо відео на паузу
+          // Подія втрати маркера №0
           this.el.addEventListener('targetLost', () => {
-            console.log("Маркер відео втрачено.");
+            console.log("Маркер відео втрачено");
             this.video.pause();
           });
         }
       });
 
-      // Функція «дозвілу» від користувача (потрібна для мобільних телефонів)
+      // Функція активації для обходу безпеки iOS/Android
       function startARMedia() {
         const video = document.querySelector('#ar-video');
         video.play().then(() => {
-          // Якщо відео успішно стартувало у фоні, ховаємо кнопку
           document.getElementById('ar-overlay-btn').style.display = 'none';
         }).catch(err => {
-          console.error("Не вдалося активувати відео:", err);
+          console.error("Помилка активації відеопотоку:", err);
         });
       }
     </script>
@@ -77,12 +76,11 @@
       
       <a-assets>
         <video id="ar-video" 
-               src="https://archive.org/download/BigBuckBunny_124/BigBuckBunny.mp4" 
+               src="./video.mp4" 
                preload="auto" 
                loop="true" 
                webkit-playsinline 
-               playsinline 
-               crossorigin="anonymous">
+               playsinline>
         </video>
       </a-assets>
 
