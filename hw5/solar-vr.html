@@ -2,123 +2,62 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Фізична модель Сонячної системи - VR</title>
+    <title>Сонячна система - VR Проект</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
 </head>
 <body>
     <a-scene>
         <a-assets>
-            <img id="sun-txt" src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/space/sun.jpg" crossorigin="anonymous">
-            <img id="mercury-txt" src="https://i.imgur.com/7A707Gg.jpeg" crossorigin="anonymous">
-            <img id="venus-txt" src="https://i.imgur.com/w9ZgKBl.jpeg" crossorigin="anonymous">
-            <img id="earth-txt" src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/space/earth_atmo_2048.jpg" crossorigin="anonymous">
-            <img id="mars-txt" src="https://i.imgur.com/G9f66X6.jpeg" crossorigin="anonymous">
-            <img id="jupiter-txt" src="https://i.imgur.com/S6p13mN.jpeg" crossorigin="anonymous">
-            <img id="saturn-txt" src="https://i.imgur.com/791557M.jpeg" crossorigin="anonymous">
-            <img id="uranus-txt" src="https://i.imgur.com/A6SIdqC.jpeg" crossorigin="anonymous">
-            <img id="neptune-txt" src="https://i.imgur.com/w2YmQeD.jpeg" crossorigin="anonymous">
-            <img id="space-bg" src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/space/starry-sky.jpg" crossorigin="anonymous">
+            <img id="sun-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/sun.jpg" crossorigin="anonymous">
+            <img id="mercury-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/mercury.jpg" crossorigin="anonymous">
+            <img id="venus-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/venus.jpg" crossorigin="anonymous">
+            <img id="earth-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/earth.jpg" crossorigin="anonymous">
+            <img id="mars-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/mars.jpg" crossorigin="anonymous">
+            <img id="jupiter-texture" src="https://gftruiz.github.io/aframe-solar-system/assets/jupiter.jpg" crossorigin="anonymous">
+            <img id="space-bg" src="https://cdn.jsdelivr.net/gh/aframevr/sample-assets@master/assets/images/space/starry-sky.jpg" crossorigin="anonymous">
         </a-assets>
 
         <a-sky src="#space-bg"></a-sky>
-        <a-light type="ambient" color="#333"></a-light>
+
+        <a-light type="ambient" color="#444"></a-light>
         <a-light type="point" intensity="2" position="0 0 0"></a-light>
 
-        <a-sphere id="sun" position="0 0 0" radius="2.5" src="#sun-txt" 
-                  animation="property: rotation; to: 0 360 0; loop: true; dur: 25000; easing: linear">
-            <a-entity planet="name: Sun; mass: 1.989e30; dist: 0; isSun: true"></a-entity>
+        <a-sphere id="sun" position="0 0 0" radius="3" src="#sun-texture"
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
         </a-sphere>
 
-        <a-sphere radius="0.25" src="#mercury-txt"><a-entity planet="name: Mercury; mass: 3.285e23; dist: 5.79e10"></a-entity></a-sphere>
-        <a-sphere radius="0.45" src="#venus-txt"><a-entity planet="name: Venus; mass: 4.867e24; dist: 1.082e11"></a-entity></a-sphere>
-        <a-sphere radius="0.50" src="#earth-txt"><a-entity planet="name: Earth; mass: 5.972e24; dist: 1.496e11"></a-entity></a-sphere>
-        <a-sphere radius="0.35" src="#mars-txt"><a-entity planet="name: Mars; mass: 6.39e23; dist: 2.279e11"></a-entity></a-sphere>
-        <a-sphere radius="1.20" src="#jupiter-txt"><a-entity planet="name: Jupiter; mass: 1.898e27; dist: 3.800e11"></a-entity></a-sphere>
-        <a-sphere radius="0.95" src="#saturn-txt"><a-entity planet="name: Saturn; mass: 5.683e26; dist: 5.200e11"></a-entity></a-sphere>
-        <a-sphere radius="0.70" src="#uranus-txt"><a-entity planet="name: Uranus; mass: 8.681e25; dist: 6.800e11"></a-entity></a-sphere>
-        <a-sphere radius="0.70" src="#neptune-txt"><a-entity planet="name: Neptune; mass: 1.024e26; dist: 8.200e11"></a-entity></a-sphere>
+        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+            <a-sphere position="5 0 0" radius="0.3" src="#mercury-texture"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear">
+            </a-sphere>
+        </a-entity>
 
-        <a-entity camera look-controls wasd-controls position="0 12 18" rotation="-35 0 0"></a-entity>
+        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
+            <a-sphere position="8 0 0" radius="0.5" src="#venus-texture"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
+            </a-sphere>
+        </a-entity>
+
+        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear">
+            <a-sphere position="12 0 0" radius="0.6" src="#earth-texture"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+            </a-sphere>
+        </a-entity>
+
+        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 16000; easing: linear">
+            <a-sphere position="16 0 0" radius="0.4" src="#mars-texture"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+            </a-sphere>
+        </a-entity>
+
+        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 25000; easing: linear">
+            <a-sphere position="22 0 0" radius="1.2" src="#jupiter-texture"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
+            </a-sphere>
+        </a-entity>
+
+        <a-entity camera look-controls wasd-controls position="0 15 30" rotation="-25 0 0"></a-entity>
+
     </a-scene>
-
-    <script>
-        const G = 6.6743e-11;
-        const planets = [];
-
-        AFRAME.registerComponent('planet', {
-            schema: {
-                name: {type: 'string'},
-                mass: {type: 'number'},
-                dist: {type: 'number'},
-                isSun: {type: 'boolean', default: false}
-            },
-            init: function() {
-                this.parentSphere = this.el.parentEl;
-                this.scaleFactor = 1e10; // 10 млн км = 1 метр сцени
-                
-                let startX = this.data.dist / this.scaleFactor;
-                this.parentSphere.setAttribute('position', { x: startX, y: 0, z: 0 });
-                
-                let vMag = 0;
-                if (!this.data.isSun) {
-                    // Орбітальна швидкість за законом Ньютона: sqrt(G * M_sun / r)
-                    vMag = Math.sqrt(G * 1.989e30 / this.data.dist);
-                }
-                
-                this.physicsData = {
-                    el: this.parentSphere,
-                    name: this.data.name,
-                    mass: this.data.mass,
-                    pos: [this.data.dist, 0, 0],
-                    v: [0, 0, vMag], // Рух у площині XZ
-                    a: [0, 0, 0]
-                };
-                planets.push(this.physicsData);
-            }
-        });
-
-        document.querySelector('a-scene').addEventListener('render-target-loaded', function () {
-            const sceneEl = document.querySelector('a-scene');
-            const dt = 86400 * 5; // Крок інтегрування: 5 днів за кадр для плавності й швидкості
-
-            sceneEl.tick = function(time, timeDelta) {
-                // Розрахунок прискорення гравітації між усіма тілами
-                for (let i = 0; i < planets.length; i++) {
-                    planets[i].a = [0, 0, 0];
-                    for (let j = 0; j < planets.length; j++) {
-                        if (i !== j) {
-                            let r = [
-                                planets[j].pos[0] - planets[i].pos[0],
-                                planets[j].pos[1] - planets[i].pos[1],
-                                planets[j].pos[2] - planets[i].pos[2]
-                            ];
-                            let dist = Math.sqrt(r[0]*r[0] + r[1]*r[1] + r[2]*r[2]) || 1;
-                            let forceMag = (G * planets[j].mass) / Math.pow(dist, 3);
-                            
-                            planets[i].a[0] += forceMag * r[0];
-                            planets[i].a[1] += forceMag * r[1];
-                            planets[i].a[2] += forceMag * r[2];
-                        }
-                    }
-                }
-
-                // Оновлення векторів швидкості та координат (метод Ейлера-Кромера)
-                for (let i = 0; i < planets.length; i++) {
-                    if (planets[i].name === 'Sun') continue;
-
-                    for (let k = 0; k < 3; k++) {
-                        planets[i].v[k] += planets[i].a[k] * dt;
-                        planets[i].pos[k] += planets[i].v[k] * dt;
-                    }
-
-                    planets[i].el.setAttribute('position', {
-                        x: planets[i].pos[0] / 1e10,
-                        y: planets[i].pos[1] / 1e10,
-                        z: planets[i].pos[2] / 1e10
-                    });
-                }
-            };
-        });
-    </script>
 </body>
 </html>
