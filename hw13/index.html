@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ханойські вежі — WebXR AR</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.176.0/build/three.module.js",
+            "ARButton": "https://unpkg.com/three@0.176.0/examples/jsm/webxr/ARButton.js",
+            "OrbitControls": "https://unpkg.com/three@0.176.0/examples/jsm/controls/OrbitControls.js"
+        }
+    }
+    </script>
+    <style>
+        body { margin: 0; background-color: black; overflow: hidden;
+               font-family: 'Segoe UI', system-ui, sans-serif; }
+        #info {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+            padding: 14px 18px; color: #e8e8f0; font-size: 0.88rem; line-height: 1.5;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+            pointer-events: none;
+        }
+        #info b { color: #a78bfa; }
+        #hint {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            z-index: 5; color: #94a3b8; font-size: 0.8rem; text-align: center;
+            background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <b>Ханойські вежі (WebXR AR).</b> 7 кілець, кольори веселки.
+        Парні кільця → <b>середній</b> стрижень, непарні → <b>правий</b>.
+    </div>
+    <div id="hint">«Enter AR» на телефоні (Chrome) · на комп'ютері — обертайте мишею</div>
+    <script type="module" src="webxr-scene.js"></script>
+</body>
+</html>
