@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindAR - Star Wars Mandalorian Visor</title>
+    
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
+  </head>
+  <body>
+
+    <a-scene mindar-face="autoStart: true;" 
+             embedded
+             renderer="colorManagement: true; physicallyCorrectLights: false;" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+      
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-light type="ambient" intensity="0.6"></a-light>
+      <a-light type="directional" position="0 1 1" intensity="0.8"></a-light>
+
+      <a-entity mindar-face-target="anchorIndex: 168">
+        
+        <a-box width="0.16" height="0.04" depth="0.02" color="#7f8c8d" 
+               material="roughness: 0.2; metalness: 0.8" position="0 0.04 0.015">
+        </a-box>
+
+        <a-box width="0.15" height="0.018" depth="0.022" color="#111111" 
+               material="roughness: 0.1; metalness: 0.9" position="0 0.01 0.016">
+        </a-box>
+
+        <a-box width="0.025" height="0.06" depth="0.021" color="#111111" 
+               material="roughness: 0.1; metalness: 0.9" position="0 -0.02 0.016">
+        </a-box>
+
+        <a-box width="0.05" height="0.05" depth="0.02" color="#95a5a6" 
+               material="roughness: 0.2; metalness: 0.8" position="-0.055 -0.02 0.014" rotation="0 15 0">
+        </a-box>
+
+        <a-box width="0.05" height="0.05" depth="0.02" color="#95a5a6" 
+               material="roughness: 0.2; metalness: 0.8" position="0.055 -0.02 0.014" rotation="0 -15 0">
+        </a-box>
+
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
