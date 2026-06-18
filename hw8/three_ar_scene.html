@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanoi Towers - Three.js & MindAR</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #container { width: 100vw; height: 100vh; position: relative; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            // 1. Ініціалізація MindAR контейнера для Three.js
+            const mindarThree = new MindARThree({
+                container: document.querySelector("#container"),
+                imageTargetSrc: "./hanoi_target.mind" // Кастомний маркер (Герб Ханоя)
+            });
+
+            const { scene, camera, renderer } = mindarThree;
+
+            // Додаємо освітлення в AR сцену
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            dirLight.position.set(0, 2, 2);
+            scene.add(dirLight);
+
+            // 2. Створення AR-якоря (індекс 0 — наш єдиний маркер)
+            const anchor = mindarThree.addAnchor(0);
+
+            // Група-контейнер для масштабування та центрування об'єктів на площині зображення
+            const hanoiGroup = new THREE.Group();
+            hanoiGroup.scale.set(0.2, 0.2, 0.2); // Зменшуємо, щоб вежа помістилася на маркері
+            hanoiGroup.position.set(0, 0, 0);
+            anchor.group.add(hanoiGroup);
+
+            // 3. Побудова геометрії вежі всередині групи
+            const baseGeo = new THREE.BoxGeometry(3, 0.1, 1);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x4a2700, roughness: 0.8 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            hanoiGroup.add(base);
+
+            const pegGeo = new THREE.CylinderGeometry(0.04, 0.04, 1, 32);
+            const pegMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c });
+            
+            const pegsX = { 'left': -1, 'center': 0, 'right': 1 };
+            Object.values(pegsX).forEach(x => {
+                const peg = new THREE.Mesh(pegGeo, pegMat);
+                peg.position.set(x, 0.5, 0);
+                hanoiGroup.add(peg);
+            });
+
+            // 4. Створення 7 кілець
+            const rainbowColors = [0x9400D3, 0x4B0082, 0x0000FF, 0x00FF00, 0xFFFF00, 0xFF7F00, 0xFF0000];
+            const disks = [];
+            const diskHeights = { 'left': 7, 'center': 0, 'right': 0 };
+
+            for (let i = 0; i < 7; i++) {
+                const diskNum = 7 - i;
+                const radius = 0.4 - (i * 0.045);
+                const tubeRadius = 0.03;
+                
+                const torusGeo = new THREE.TorusGeometry(radius, tubeRadius, 16, 32);
+                const torusMat = new THREE.MeshStandardMaterial({ color: rainbowColors[6 - i], roughness: 0.4 });
+                const disk = new THREE.Mesh(torusGeo, torusMat);
+                
+                disk.rotation.x = Math.PI / 2;
+                disk.position.set(-1, 0.05 + (i * 0.11), 0); // Початкова позиція Y у масштабі групи
+                hanoiGroup.add(disk);
+                
+                disks.push({
+                    mesh: disk,
+                    num: diskNum,
+                    isMoving: false,
+                    targetX: -1,
+                    targetY: disk.position.y
+                });
+            }
+
+            // 5. Керування станами переміщення
+            let currentMovingIndex = 6;
+            let lastMoveTime = 0;
+            const moveInterval = 1500;
+
+            function triggerNextMove() {
+                if (currentMovingIndex < 0) return;
+
+                let diskObj = disks[currentMovingIndex];
+                let targetPeg = (diskObj.num % 2 === 0) ? 'center' : 'right';
+                
+                diskObj.targetX = pegsX[targetPeg];
+                diskObj.targetY = 0.05 + (diskHeights[targetPeg] * 0.11);
+                
+                diskHeights['left']--;
+                diskHeights[targetPeg]++;
+                diskObj.isMoving = true;
+                
+                currentMovingIndex--;
+            }
+
+            // 6. Запуск двигуна та циклу рендерингу MindAR
+            await mindarThree.start();
+            
+            const clock = new THREE.Clock();
+
+            renderer.setAnimationLoop(() => {
+                const elapsedTime = clock.getElapsedTime() * 1000;
+
+                if (elapsedTime - lastMoveTime > moveInterval) {
+                    triggerNextMove();
+                    lastMoveTime = elapsedTime;
+                }
+
+                // Оновлення позиції кілець за допомогою лінійної інтерполяції
+                disks.forEach(diskObj => {
+                    if (diskObj.isMoving) {
+                        diskObj.mesh.position.x += (diskObj.targetX - diskObj.mesh.position.x) * 0.12;
+                        diskObj.mesh.position.y += (diskObj.targetY - diskObj.mesh.position.y) * 0.12;
+
+                        if (Math.abs(diskObj.mesh.position.x - diskObj.targetX) < 0.005 && 
+                            Math.abs(diskObj.mesh.position.y - diskObj.targetY) < 0.005) {
+                            diskObj.mesh.position.set(diskObj.targetX, diskObj.targetY, 0);
+                            diskObj.isMoving = false;
+                        }
+                    }
+                });
+
+                renderer.render(scene, camera);
+            });
+        });
+    </script>
+</body>
+</html>

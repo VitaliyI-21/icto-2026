@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hanoi Towers - Pure Three.js VR</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; }
+        canvas { width: 100vw; height: 100vh; display: block; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <script>
+        // 1. Ініціалізація базових елементів Three.js
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a1a);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 4, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // 2. Освітлення
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(-2, 5, 3);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // 3. Геометрія: Основа та 3 Стрижні
+        const baseGeo = new THREE.BoxGeometry(6, 0.2, 2);
+        const baseMat = new THREE.MeshStandardMaterial({ color: 0x4a2700, roughness: 0.8 });
+        const base = new THREE.Mesh(baseGeo, baseMat);
+        base.receiveShadow = true;
+        scene.add(base);
+
+        const pegGeo = new THREE.CylinderGeometry(0.08, 0.08, 2, 32);
+        const pegMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c, roughness: 0.5 });
+        
+        const pegs = { 'left': -2, 'center': 0, 'right': 2 };
+        Object.values(pegs).forEach(x => {
+            const peg = new THREE.Mesh(pegGeo, pegMat);
+            peg.position.set(x, 1, 0);
+            peg.castShadow = true;
+            scene.add(peg);
+        });
+
+        // 4. Створення 7 кілець (Кольори веселки від Червоного до Фіолетового)
+        const rainbowColors = [
+            0x9400D3, // 1: Фіолетовий (Найменший, зверху)
+            0x4B0082, // 2: Синій
+            0x0000FF, // 3: Блакитний
+            0x00FF00, // 4: Зелений
+            0xFFFF00, // 5: Жовтий
+            0xFF7F00, // 6: Помаранчевий
+            0xFF0000  // 7: Червоний (Найбільший, знизу)
+        ];
+
+        const disks = [];
+        const diskHeights = { 'left': 7, 'center': 0, 'right': 0 };
+        
+        // Крок по Y між кільцями = 0.22 (виходячи з товщини тора)
+        for (let i = 0; i < 7; i++) {
+            const diskNum = 7 - i; // 7 (Червоний) знизу, 1 (Фіолетовий) зверху
+            const radius = 0.8 - (i * 0.09);
+            const tubeRadius = 0.07;
+            
+            const torusGeo = new THREE.TorusGeometry(radius, tubeRadius, 16, 64);
+            const torusMat = new THREE.MeshStandardMaterial({ color: rainbowColors[6 - i], roughness: 0.3, metalness: 0.1 });
+            const disk = new THREE.Mesh(torusGeo, torusMat);
+            
+            disk.rotation.x = Math.PI / 2;
+            // Початкове укладання на лівому стрижні
+            disk.position.set(-2, 0.1 + (i * 0.22), 0);
+            disk.castShadow = true;
+            scene.add(disk);
+            
+            disks.push({
+                mesh: disk,
+                num: diskNum,
+                isMoving: false,
+                targetX: -2,
+                targetY: disk.position.y
+            });
+        }
+
+        // 5. Логіка покрокової анімації
+        let currentMovingIndex = 6; // Починаємо з найменшого кільця (індекс 6 у масиві disks = disk-1)
+        let lastMoveTime = 0;
+        const moveInterval = 1500; // 1.5 секунди на крок
+
+        function triggerNextMove() {
+            if (currentMovingIndex < 0) return;
+
+            let diskObj = disks[currentMovingIndex];
+            let targetPeg = (diskObj.num % 2 === 0) ? 'center' : 'right';
+            
+            diskObj.targetX = pegs[targetPeg];
+            diskObj.targetY = 0.1 + (diskHeights[targetPeg] * 0.22);
+            
+            diskHeights['left']--;
+            diskHeights[targetPeg]++;
+            diskObj.isMoving = true;
+            
+            currentMovingIndex--; // Переходимо до наступного кільця в черзі
+        }
+
+        // 6. Цикл рендерингу (Аналог методу tick)
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime() * 1000;
+
+            // Тригер за часом
+            if (elapsedTime - lastMoveTime > moveInterval) {
+                triggerNextMove();
+                lastMoveTime = elapsedTime;
+            }
+
+            // Інтерполяція позицій (Плавний Lerp рух)
+            disks.forEach(diskObj => {
+                if (diskObj.isMoving) {
+                    // Плавне зміщення по X та Y
+                    diskObj.mesh.position.x += (diskObj.targetX - diskObj.mesh.position.x) * 0.1;
+                    diskObj.mesh.position.y += (diskObj.targetY - diskObj.mesh.position.y) * 0.1;
+
+                    // Фіксація при наближенні до цілі
+                    if (Math.abs(diskObj.mesh.position.x - diskObj.targetX) < 0.01 && 
+                        Math.abs(diskObj.mesh.position.y - diskObj.targetY) < 0.01) {
+                        diskObj.mesh.position.set(diskObj.targetX, diskObj.targetY, 0);
+                        diskObj.isMoving = false;
+                    }
+                }
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Адаптація під зміну розмірів вікна
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
