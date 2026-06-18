@@ -1,57 +1,109 @@
 <!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <title>Сонячна система - VR</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-</head>
-<body>
-    <a-scene>
-        <a-assets>
-            <img id="sun-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/sun.jpg" crossorigin="anonymous">
-            <img id="mercury-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/mercury.jpg" crossorigin="anonymous">
-            <img id="venus-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/venus.jpg" crossorigin="anonymous">
-            <img id="earth-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/earth.jpg" crossorigin="anonymous">
-            <img id="mars-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/mars.jpg" crossorigin="anonymous">
-            <img id="jupiter-txt" src="https://gftruiz.github.io/aframe-solar-system/assets/jupiter.jpg" crossorigin="anonymous">
-            <img id="space-bg" src="https://cdn.jsdelivr.net/gh/aframevr/sample-assets@master/assets/images/space/starry-sky.jpg" crossorigin="anonymous">
-        </a-assets>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Solar System VR Physical Model</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script>
+      // Глобальні фізичні константи
+      const G = 6.6743e-11; 
+      const SUN_MASS = 1.989e30;
+      let planets = [];
 
-        <a-sky src="#space-bg"></a-sky>
+      AFRAME.registerComponent('physics-engine', {
+        tick: function(time, timeDelta) {
+          // Крок інтегрування: ~8 годин (28800 секунд) для балансу точності та швидкості
+          const dt = 28800; 
+          
+          // 1. Розрахунок прискорень за законом Всесвітнього тяжіння
+          for (let i = 0; i < planets.length; i++) {
+            planets[i].a = [0, 0, 0];
+            for (let j = 0; j < planets.length; j++) {
+              if (i !== j) {
+                let r = [
+                  planets[j].pos[0] - planets[i].pos[0],
+                  planets[j].pos[1] - planets[i].pos[1],
+                  planets[j].pos[2] - planets[i].pos[2]
+                ];
+                let dist = Math.sqrt(r[0]**2 + r[1]**2 + r[2]**2);
+                if (dist < 1e6) continue; // Запобігання діленню на нуль
+                
+                let forceMagnitude = (G * planets[j].mass) / Math.pow(dist, 3);
+                for (let k = 0; k < 3; k++) {
+                  planets[i].a[k] += forceMagnitude * r[k];
+                }
+              }
+            }
+          }
+          
+          // 2. Оновлення швидкостей, позицій та перенесення в A-Frame (10^9 м = 1 одиниця)
+          for (let i = 0; i < planets.length; i++) {
+            for (let k = 0; k < 3; k++) {
+              planets[i].v[k] += planets[i].a[k] * dt;
+              planets[i].pos[k] += planets[i].v[k] * dt;
+            }
+            planets[i].el.setAttribute('position', {
+              x: planets[i].pos[0] / 1000000000,
+              y: planets[i].pos[1] / 1000000000,
+              z: planets[i].pos[2] / 1000000000
+            });
+            // Власне обертання навколо осі
+            let currentRot = planets[i].el.getAttribute('rotation') || {x: 0, y: 0, z: 0};
+            planets[i].el.setAttribute('rotation', {x: 0, y: currentRot.y + 0.5, z: 0});
+          }
+        }
+      });
 
-        <a-light type="ambient" color="#444"></a-light>
-        <a-light type="point" intensity="2" position="0 0 0"></a-light>
+      AFRAME.registerComponent('planet', {
+        schema: {
+          name: {type: 'string'},
+          mass: {type: 'number'},
+          dist: {type: 'number'}, // Відстань у метрах від Сонця
+          v0: {type: 'number'}    // Початкова орбітальна швидкість м/с
+        },
+        init: function() {
+          this.v = [0, 0, this.data.v0]; // Напрямок швидкості по дотичній
+          
+          planets.push({
+            el: this.el,
+            name: this.data.name,
+            mass: this.data.mass,
+            pos: [this.data.dist, 0, 0],
+            v: this.v,
+            a: [0, 0, 0]
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene physics-engine>
+      <a-assets>
+        <img id="sky" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/cube/MilkyWay/dark-s_px.jpg">
+        <img id="sun" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/sun.jpg">
+        <img id="mercury" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/mercury.jpg">
+        <img id="venus" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/venus_surface.jpg">
+        <img id="earth" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg">
+        <img id="mars" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/mars.jpg">
+        <img id="jupiter" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/jupiter.jpg">
+        <img id="saturn" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/saturn.jpg">
+      </a-assets>
 
-        <a-sphere id="sun" position="0 0 0" radius="3" src="#sun-txt"
-                  animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
-        </a-sphere>
+      <a-sky src="#sky"></a-sky>
+      <a-camera position="0 40 120" look-controls wash-controls></a-camera>
+      <a-light type="ambient" color="#444"></a-light>
+      <a-light type="point" intensity="2" position="0 0 0"></a-light>
 
-        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-            <a-sphere position="5 0 0" radius="0.3" src="#mercury-txt"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear"></a-sphere>
-        </a-entity>
+      <a-sphere id="sun-obj" position="0 0 0" radius="12" src="#sun" material="shader: flat">
+        <a-entity planet="name: Sun; mass: 1.989e30; dist: 0; v0: 0"></a-entity>
+      </a-sphere>
 
-        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
-            <a-sphere position="8 0 0" radius="0.5" src="#venus-txt"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear"></a-sphere>
-        </a-entity>
-
-        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear">
-            <a-sphere position="12 0 0" radius="0.6" src="#earth-txt"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-sphere>
-        </a-entity>
-
-        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 16000; easing: linear">
-            <a-sphere position="16 0 0" radius="0.4" src="#mars-txt"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-sphere>
-        </a-entity>
-
-        <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 25000; easing: linear">
-            <a-sphere position="21 0 0" radius="1.2" src="#jupiter-txt"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"></a-sphere>
-        </a-entity>
-
-        <a-entity camera look-controls wasd-controls position="0 18 28" rotation="-30 0 0"></a-entity>
+      <a-sphere radius="1.2" src="#mercury" planet="name: Mercury; mass: 3.301e23; dist: 57900000000; v0: 47400"></a-sphere>
+      <a-sphere radius="2.2" src="#venus" planet="name: Venus; mass: 4.867e24; dist: 108200000000; v0: 35000"></a-sphere>
+      <a-sphere radius="2.5" src="#earth" planet="name: Earth; mass: 5.972e24; dist: 149600000000; v0: 29800"></a-sphere>
+      <a-sphere radius="1.8" src="#mars" planet="name: Mars; mass: 6.417e23; dist: 227900000000; v0: 24100"></a-sphere>
+      <a-sphere radius="5.5" src="#jupiter" planet="name: Jupiter; mass: 1.898e27; dist: 420000000000; v0: 13100"></a-sphere>
+      
     </a-scene>
-</body>
+  </body>
 </html>
