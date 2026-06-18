@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar System AR - MindAR</title>
+    <title>Solar System AR - Fixed</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
@@ -19,27 +19,27 @@
              device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <img id="sun" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/sun.jpg">
-        <img id="earth" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg">
-        <img id="jupiter" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/jupiter.jpg">
+        <img id="sun-texture" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/sun.jpg" crossorigin="anonymous">
+        <img id="earth-texture" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg" crossorigin="anonymous">
+        <img id="jupiter-texture" src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/jupiter.jpg" crossorigin="anonymous">
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image="targetIndex: 0">
-        <a-sphere radius="0.3" src="#sun" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000"></a-sphere>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-sphere radius="0.3" src="#sun-texture" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000"></a-sphere>
         <a-text value="Sun Center" position="-0.3 0.5 0" color="yellow" width="3"></a-text>
       </a-entity>
 
-      <a-entity mindar-image="targetIndex: 1">
-        <a-sphere radius="0.2" src="#earth" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-sphere>
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-sphere radius="0.2" src="#earth-texture" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-sphere>
         <a-text value="Earth Station" position="-0.3 0.5 0" color="cyan" width="3"></a-text>
       </a-entity>
 
-      <a-entity mindar-image="targetIndex: 2">
+      <a-entity mindar-image-target="targetIndex: 2">
         <a-entity rotation="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000">
-             <a-sphere position="0 0 0" radius="0.15" src="#sun"></a-sphere>
-             <a-sphere position="0.4 0 0" radius="0.08" src="#jupiter"></a-sphere>
+             <a-sphere position="0 0 0" radius="0.15" src="#sun-texture"></a-sphere>
+             <a-sphere position="0.4 0 0" radius="0.08" src="#jupiter-texture"></a-sphere>
         </a-entity>
         <a-text value="My Custom VR Marker" position="-0.5 -0.4 0" color="green" width="4"></a-text>
       </a-entity>
