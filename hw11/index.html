@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AR Маска</title>
 
-  <!-- MindAR Face: звичайний <script>, створює глобальний window.MINDAR -->
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-face-three.prod.js"></script>
+  <!-- MindAR Face 1.1.5: ця версія - самодостатній глобальний скрипт,
+       створює window.MINDAR без ES-import (на відміну від новіших збірок) -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-face-three.prod.js"></script>
 
-  <!-- importmap для three (потрібен Three.js усередині модуля main.js) -->
+  <!-- importmap для three -->
   <script type="importmap">
   {
     "imports": {
-      "three": "https://unpkg.com/three/build/three.module.js"
+      "three": "https://unpkg.com/three@0.137.0/build/three.module.js"
     }
   }
   </script>
 
-  <!-- основна програма як модуль -->
   <script src="./main.js" type="module"></script>
 
   <style>

@@ -1,3 +1,13 @@
+// Перевірка, що MindAR завантажився як глобальний скрипт
+if (!window.MINDAR || !window.MINDAR.FACE) {
+  document.body.insertAdjacentHTML('afterbegin',
+    '<div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b41e1e;' +
+    'color:#fff;padding:14px;font-family:sans-serif;font-size:14px;">' +
+    'Помилка: бібліотека MindAR не завантажилась. Перевірте підключення ' +
+    'mind-ar@1.1.5 та з\'єднання з інтернетом.</div>');
+  throw new Error('window.MINDAR.FACE is undefined');
+}
+
 // THREE береться з глобального об'єкта MindAR (як у методичці, розділ 4.1)
 const THREE = window.MINDAR.FACE.THREE;
 
