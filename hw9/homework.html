@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindAR - Multi-target Video and 3D Model</title>
+    <title>MindAR - Fixed Multi-target Scene</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -11,62 +11,71 @@
     <style>
       body { margin: 0; overflow: hidden; }
       
-      /* Кнопка активації звуку/відео для мобільних браузерів */
-      #play-button {
+      /* Елемент інтерфейсу для активації медіапотоку на мобільних пристроях */
+      #ar-overlay-btn {
         position: absolute;
-        bottom: 20px;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 9999;
-        padding: 12px 24px;
+        padding: 15px 30px;
         background: #00ff66;
-        color: #000;
+        color: #000000;
         border: none;
-        border-radius: 25px;
+        border-radius: 30px;
         font-family: sans-serif;
         font-weight: bold;
         font-size: 16px;
         cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        transition: all 0.2s ease;
+      }
+      #ar-overlay-btn:active {
+        transform: translateX(-50%) scale(0.95);
       }
     </style>
 
     <script>
-      // Компонент для автоматичного керування відео при знаходженні/втраті маркера
-      AFRAME.registerComponent('video-handler', {
+      // Компонент контролю відтворення відео при взаємодії з маркером
+      AFRAME.registerComponent('video-controller', {
         init: function () {
           this.video = document.querySelector('#ar-video');
-          this.marker = this.el;
-
-          this.marker.addEventListener('targetFound', () => {
-            this.video.play().catch(err => console.log("Чекаємо на клік користувача:", err));
+          
+          // Подія: Маркер знайдено в кадрі
+          this.el.addEventListener('targetFound', () => {
+            console.log("Маркер відео знайдено");
+            this.video.play().catch(err => {
+              console.log("Браузер заблокував автоплей. Очікування кліку на кнопку.");
+            });
           });
 
-          this.marker.addEventListener('targetLost', () => {
+          // Подія: Маркер зник із кадру
+          this.el.addEventListener('targetLost', () => {
+            console.log("Маркер відео втрачено");
             this.video.pause();
           });
         }
       });
 
-      // Функція для ручного запуску відео після кліку на кнопку UI
-      function initVideo() {
+      // Функція ручного тригеру для обходу політики безпеки браузерів
+      function startARMedia() {
         const video = document.querySelector('#ar-video');
         video.play().then(() => {
-          // Якщо запуск успішний, ховаємо кнопку
-          document.getElementById('play-button').style.display = 'none';
+          // Якщо відео успішно стартувало, ховаємо кнопку з екрана
+          document.getElementById('ar-overlay-btn').style.display = 'none';
         }).catch(err => {
-          console.error("Помилка відтворення:", err);
+          console.error("Помилка ініціалізації медіа:", err);
         });
       }
     </script>
   </head>
   <body>
 
-    <button id="play-button" onclick="initVideo()">Увімкнути AR Відео</button>
+    <button id="ar-overlay-btn" onclick="startARMedia()">Запустити AR Контент</button>
 
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 2" 
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 2;" 
              embedded
-             renderer="colorManagement: true, physicallyCorrectLights" 
+             renderer="colorManagement: true; physicallyCorrectLights: true;" 
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: false">
       
@@ -77,25 +86,24 @@
                loop="true" 
                webkit-playsinline 
                playsinline 
-               muted="false" 
                crossorigin="anonymous">
         </video>
 
-        <a-asset-item id="drone-model" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/SciFiHelmet/glTF/SciFiHelmet.gltf"></a-asset-item>
+        <a-asset-item id="drone-model" src="https://unpkg.com/three@0.147.0/examples/models/gltf/SciFiHelmet/glTF/SciFiHelmet.gltf"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0" video-handler>
-        <a-video src="#ar-video" width="1" height="0.5625" position="0 0 0" rotation="0 0 0"></a-video>
+      <a-entity mindar-image-target="targetIndex: 0" video-controller>
+        <a-video src="#ar-video" width="1" height="0.5625" position="0 0 0"></a-video>
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 1">
         <a-gltf-model src="#drone-model" 
-                      scale="0.4 0.4 0.4" 
+                      scale="0.5 0.5 0.5" 
                       position="0 0 0" 
                       rotation="0 0 0"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000">
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 9000">
         </a-gltf-model>
       </a-entity>
 
