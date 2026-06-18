@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Сонячна система — AR</title>
+
+  <!--
+    КРИТИЧНО: порядок завантаження скриптів
+    1. A-Frame
+    2. MindAR (має бути ПІСЛЯ A-Frame)
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{overflow:hidden;background:#000}
+    #hint{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,.75);color:#fff;
+      padding:.5rem 1.3rem;border-radius:10px;
+      font-size:.82rem;font-family:system-ui;
+      text-align:center;pointer-events:none;z-index:999;
+      border:1px solid #00d4ff;
+      animation:pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;border-color:#00d4ff}50%{opacity:.6;border-color:#0066aa}}
+    #topbar{
+      position:fixed;top:0;left:0;right:0;
+      background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent);
+      padding:.6rem 1rem .8rem;
+      color:#00d4ff;font-family:system-ui;font-size:.78rem;font-weight:600;
+      letter-spacing:.04em;text-align:center;z-index:999;pointer-events:none;
+    }
+    #planet-label{
+      position:fixed;top:50px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,.8);color:#fff;
+      padding:.35rem .9rem;border-radius:6px;
+      font-size:.78rem;font-family:system-ui;
+      display:none;z-index:999;border:1px solid #00d4ff;
+      pointer-events:none;text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="topbar">🪐 AR — Сонячна система</div>
+<div id="hint">📷 Наведіть камеру на маркер із зображенням Землі</div>
+<div id="planet-label"></div>
+
+<a-scene
+  mindar-image="imageTargetSrc:./targets.mind;autoStart:true;uiLoading:yes;uiError:yes;uiScanning:yes"
+  color-space="sRGB"
+  renderer="colorManagement:true;antialias:true"
+  vr-mode-ui="enabled:false"
+  device-orientation-permission-ui="enabled:false">
+
+  <a-assets timeout="30000">
+    <!-- Земля — three.js (CORS OK, GitHub raw) -->
+    <img id="t-earth"
+      src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg"
+      crossorigin="anonymous"/>
+    <!-- Місяць -->
+    <img id="t-moon"
+      src="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/moon_1024.jpg"
+      crossorigin="anonymous"/>
+  </a-assets>
+
+  <!-- ══ Маркер 0 = зображення Землі ══ -->
+  <a-entity mindar-image-target="targetIndex:0">
+
+    <!--
+      Вся сцена обернута на -90° бо маркер горизонтальний,
+      масштаб 0.08 щоб система помістилась на маркері
+    -->
+    <a-entity rotation="-90 0 0" scale="0.07 0.07 0.07">
+
+      <!-- Світло -->
+      <a-light type="point" position="0 0 0" color="#fff5e0" intensity="2.5" decay="1" distance="150"></a-light>
+      <a-light type="ambient" color="#111122" intensity="0.7"></a-light>
+
+      <!-- Сонце -->
+      <a-sphere position="0 0 0" radius="4"
+                material="color:#ff8800;emissive:#ff4400;emissiveIntensity:0.7;shader:standard"
+                animation="property:rotation;to:0 360 0;loop:true;dur:20000;easing:linear"
+                class="ar-planet" data-name="☀️ Сонце">
+      </a-sphere>
+
+      <!-- Орбітальні кільця -->
+      <a-entity ar-orbit-rings></a-entity>
+
+      <!-- Меркурій -->
+      <a-entity ar-orbit="speed:1.607;radius:7">
+        <a-sphere radius="0.32" position="7 0 0"
+                  material="color:#9e9e9e;shader:standard;roughness:0.95"
+                  animation="property:rotation;to:0 360 0;loop:true;dur:5000;easing:linear"
+                  class="ar-planet" data-name="☿ Меркурій">
+        </a-sphere>
+      </a-entity>
+
+      <!-- Венера -->
+      <a-entity ar-orbit="speed:1.174;radius:11">
+        <a-sphere radius="0.85" position="11 0 0"
+                  material="color:#e8c97a;shader:standard;roughness:0.85"
+                  animation="property:rotation;to:0 -360 0;loop:true;dur:22000;easing:linear"
+                  class="ar-planet" data-name="♀ Венера">
+        </a-sphere>
+      </a-entity>
+
+      <!-- Земля з текстурою -->
+      <a-entity ar-orbit="speed:1.0;radius:16">
+        <a-sphere radius="0.9" position="16 0 0"
+                  src="#t-earth"
+                  material="shader:standard;roughness:0.7"
+                  animation="property:rotation;to:0 360 0;loop:true;dur:1400;easing:linear"
+                  class="ar-planet" data-name="🌍 Земля">
+        </a-sphere>
+      </a-entity>
+
+      <!-- Марс -->
+      <a-entity ar-orbit="speed:0.802;radius:22">
+        <a-sphere radius="0.48" position="22 0 0"
+                  material="color:#c1440e;shader:standard;roughness:0.98"
+                  animation="property:rotation;to:0 360 0;loop:true;dur:1400;easing:linear"
+                  class="ar-planet" data-name="♂ Марс">
+        </a-sphere>
+      </a-entity>
+
+      <!-- Юпітер -->
+      <a-entity ar-orbit="speed:0.434;radius:36">
+        <a-sphere radius="2.5" position="36 0 0"
+                  material="color:#c88b3a;shader:standard;roughness:0.6"
+                  animation="property:rotation;to:0 360 0;loop:true;dur:350;easing:linear"
+                  class="ar-planet" data-name="♃ Юпітер">
+        </a-sphere>
+      </a-entity>
+
+      <!-- Сатурн + кільця -->
+      <a-entity ar-orbit="speed:0.323;radius:52">
+        <a-entity position="52 0 0">
+          <a-sphere radius="2.1"
+                    material="color:#e4d191;shader:standard;roughness:0.7"
+                    animation="property:rotation;to:0 360 0;loop:true;dur:420;easing:linear"
+                    class="ar-planet" data-name="♄ Сатурн">
+          </a-sphere>
+          <a-torus radius="3.3" radius-tubular="0.6" segments-tubular="3" segments-radial="60"
+                   rotation="90 0 0"
+                   material="color:#c8b577;opacity:0.6;transparent:true;side:double;shader:flat">
+          </a-torus>
+          <a-torus radius="4.3" radius-tubular="0.4" segments-tubular="3" segments-radial="60"
+                   rotation="90 0 0"
+                   material="color:#d4c48e;opacity:0.35;transparent:true;side:double;shader:flat">
+          </a-torus>
+        </a-entity>
+      </a-entity>
+
+      <!-- Уран -->
+      <a-entity ar-orbit="speed:0.228;radius:67">
+        <a-sphere radius="1.45" position="67 0 0"
+                  material="color:#7de8e8;shader:standard;roughness:0.5"
+                  animation="property:rotation;to:360 0 0;loop:true;dur:600;easing:linear"
+                  class="ar-planet" data-name="⛢ Уран">
+        </a-sphere>
+      </a-entity>
+
+      <!-- Нептун -->
+      <a-entity ar-orbit="speed:0.182;radius:82">
+        <a-sphere radius="1.4" position="82 0 0"
+                  material="color:#3f54ba;shader:standard;roughness:0.5"
+                  animation="property:rotation;to:0 360 0;loop:true;dur:570;easing:linear"
+                  class="ar-planet" data-name="♆ Нептун">
+        </a-sphere>
+      </a-entity>
+
+    </a-entity>
+  </a-entity>
+
+  <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+</a-scene>
+
+<script>
+// ── AR orbit (окремий namespace від VR щоб уникнути конфліктів) ──
+AFRAME.registerComponent('ar-orbit', {
+  schema: {
+    speed:  {type:'number', default:1.0},
+    radius: {type:'number', default:10}
+  },
+  init() {
+    this._angle = Math.random() * Math.PI * 2;
+  },
+  tick(t, dt) {
+    const baseSpeed = (2 * Math.PI) / 16000;
+    this._angle += baseSpeed * this.data.speed * dt;
+    this.el.object3D.rotation.y = this._angle;
+  }
+});
+
+// ── Орбітальні кола ──
+AFRAME.registerComponent('ar-orbit-rings', {
+  init() {
+    [7, 11, 16, 22, 36, 52, 67, 82].forEach(r => {
+      const ring = document.createElement('a-torus');
+      ring.setAttribute('radius', r);
+      ring.setAttribute('radius-tubular', '0.06');
+      ring.setAttribute('segments-tubular', '100');
+      ring.setAttribute('segments-radial', '3');
+      ring.setAttribute('rotation', '90 0 0');
+      ring.setAttribute('material',
+        'color:#223366;opacity:0.35;transparent:true;shader:flat;depthWrite:false');
+      this.el.appendChild(ring);
+    });
+  }
+});
+
+// ── Підказки ──
+const hint  = document.getElementById('hint');
+const label = document.getElementById('planet-label');
+const target = document.querySelector('[mindar-image-target]');
+
+target.addEventListener('targetFound', () => { hint.style.display = 'none'; });
+target.addEventListener('targetLost',  () => { hint.style.display = 'block'; label.style.display = 'none'; });
+</script>
+</body>
+</html>
