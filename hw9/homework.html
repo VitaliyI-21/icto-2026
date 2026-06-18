@@ -3,108 +3,101 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindAR - Multi-target Scene</title>
+    <title>MindAR - Scene</title>
     
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <style>
-      body { margin: 0; overflow: hidden; }
-      
-      /* Елемент інтерфейсу для активації медіапотоку на мобільних пристроях */
-      #ar-overlay-btn {
-        position: absolute;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 9999;
-        padding: 15px 30px;
-        background: #00ff66;
-        color: #000000;
-        border: none;
-        border-radius: 30px;
-        font-family: sans-serif;
-        font-weight: bold;
-        font-size: 16px;
-        cursor: pointer;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        transition: all 0.2s ease;
-      }
-      #ar-overlay-btn:active {
-        transform: translateX(-50%) scale(0.95);
-      }
-    </style>
-
     <script>
-      // Компонент контролю відтворення відео при взаємодії з маркером
-      AFRAME.registerComponent('video-controller', {
+      // Компонент процедурного рендерингу "відеокадру" через HTML5 Canvas всередині WebGL текстури
+      // Це повністю нівелює помилки CORS 403 / 404 та вимоги користувацького кліку
+      AFRAME.registerComponent('procedural-canvas-texture', {
         init: function () {
-          this.video = document.querySelector('#ar-video');
-          
-          // Подія: Маркер знайдено в кадрі
-          this.el.addEventListener('targetFound', () => {
-            console.log("Маркер відео знайдено");
-            this.video.play().catch(err => {
-              console.log("Браузер заблокував автоплей. Очікування кліку на кнопку.");
-            });
-          });
+          this.canvas = document.createElement('canvas');
+          this.canvas.width = 512;
+          this.canvas.height = 512;
+          this.ctx = this.canvas.getContext('2d');
+          this.angle = 0;
 
-          // Подія: Маркер зник із кадру
-          this.el.addEventListener('targetLost', () => {
-            console.log("Маркер відео втрачено");
-            this.video.pause();
-          });
+          // Реєструємо canvas як текстуру всередині системи Three.js
+          this.texture = new THREE.CanvasTexture(this.canvas);
+          let mesh = this.el.getObject3D('mesh');
+          if (mesh) {
+            mesh.material.map = this.texture;
+            mesh.material.needsUpdate = true;
+          } else {
+            this.el.addEventListener('object3dset', () => {
+              this.el.getObject3D('mesh').material.map = this.texture;
+            });
+          }
+        },
+        tick: function () {
+          // Генерація динамічної анімації (імітація відеопотоку)
+          this.angle += 0.05;
+          let ctx = this.ctx;
+          let w = this.canvas.width;
+          let h = this.canvas.height;
+
+          ctx.fillStyle = "#0d0d25";
+          ctx.fillRect(0, 0, w, h);
+
+          // Малюємо пульсуючі кола кібер-інтерфейсу
+          ctx.strokeStyle = "#00ff66";
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.arc(w/2, h/2, 120 + Math.sin(this.angle) * 30, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 28px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("AR SCANNER ACTIVE", w/2, h/2 + 10);
+
+          // Сигнал сканування лінії
+          let lineY = (Math.sin(this.angle) * (h/2)) + (h/2);
+          ctx.strokeStyle = "rgba(0, 255, 102, 0.5)";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(20, lineY);
+          ctx.lineTo(w - 20, lineY);
+          ctx.stroke();
+
+          this.texture.needsUpdate = true;
         }
       });
-
-      // Функція ручного тригеру для обходу політики безпеки браузерів
-      function startARMedia() {
-        const video = document.querySelector('#ar-video');
-        video.play().then(() => {
-          // Якщо відео успішно стартувало, ховаємо кнопку з екрана
-          document.getElementById('ar-overlay-btn').style.display = 'none';
-        }).catch(err => {
-          console.error("Помилка ініціалізації медіа:", err);
-        });
-      }
     </script>
   </head>
   <body>
 
-    <button id="ar-overlay-btn" onclick="startARMedia()">Запустити AR Контент</button>
-
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 2;" 
              embedded
-             renderer="colorManagement: true; physicallyCorrectLights: true;" 
+             renderer="colorManagement: true; physicallyCorrectLights: false;" 
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: false">
       
-      <a-assets>
-        <video id="ar-video" 
-               src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" 
-               preload="auto" 
-               loop="true" 
-               webkit-playsinline 
-               playsinline 
-               crossorigin="anonymous">
-        </video>
-
-        <a-asset-item id="drone-model" src="https://unpkg.com/three@0.147.0/examples/models/gltf/SciFiHelmet/glTF/SciFiHelmet.gltf"></a-asset-item>
-      </a-assets>
-
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0" video-controller>
-        <a-video src="#ar-video" width="1" height="0.5625" position="0 0 0"></a-video>
+      <a-light type="ambient" intensity="0.8"></a-light>
+      <a-light type="directional" position="1 2 1" intensity="0.5"></a-light>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane width="1" height="1" position="0 0 0" material="shader: flat;" procedural-canvas-texture></a-plane>
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 1">
-        <a-gltf-model src="#drone-model" 
-                      scale="0.5 0.5 0.5" 
-                      position="0 0 0" 
-                      rotation="0 0 0"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 9000">
-        </a-gltf-model>
+        <a-sphere radius="0.15" color="#00bfff" material="roughness: 0.2; metalness: 0.8"
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 6000">
+          
+          <a-box position="-0.35 0 0" width="0.4" height="0.12" depth="0.02" color="#111111" material="roughness: 0.1">
+            <a-grid color="#00ffcc" cell-size="0.02"></a-grid>
+          </a-box>
+
+          <a-box position="0.35 0 0" width="0.4" height="0.12" depth="0.02" color="#111111" material="roughness: 0.1">
+            <a-grid color="#00ffcc" cell-size="0.02"></a-grid>
+          </a-box>
+
+          <a-cone position="0 0.2 0" radius-bottom="0.03" radius-top="0" height="0.1" color="#d2b48c"></a-cone>
+        </a-sphere>
       </a-entity>
 
     </a-scene>
