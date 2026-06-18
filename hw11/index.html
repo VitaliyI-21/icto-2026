@@ -23,6 +23,19 @@
   <style>
     html, body { position: relative; margin: 0; width: 100%; height: 100%;
                  overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+
+    /* Відео з камери та полотно MindAR мають заповнювати екран і бути видимими */
+    .mindar-ui-overlay { background: transparent !important; }
+    a-scene, canvas, video {
+      position: absolute !important;
+      top: 0; left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+    }
+    video { z-index: 0 !important; }
+    canvas { z-index: 1 !important; }
+
     #mask-controls {
       position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
       z-index: 10; display: flex; gap: 18px;

@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const { renderer, scene, camera } = mindarThree;
 
+    // Прозоре полотно Three.js, щоб крізь нього було видно відео з камери
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.backgroundColor = 'transparent';
+
     // --- Освітлення (напівсферичне джерело світла) ---
     const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
     scene.add(light);
