@@ -24,11 +24,5 @@
 - `index.html` — розмітка та підключення three.js
 - `main.js` — логіка сцени, завантаження моделей, WebXR
 
-## Публікація на GitHub Pages
-
-1. Створіть публічний репозиторій, завантажте `index.html`, `main.js`, `README.md`.
-2. Settings → Pages → Deploy from branch → main / root.
-3. Посилання: `https://ВАШ_ЛОГІН.github.io/НАЗВА_РЕПО/`
-
 Моделі завантажуються з офіційного репозиторію three.js
 (`raw.githubusercontent.com/mrdoob/three.js`).
